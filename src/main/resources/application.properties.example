@@ -1,0 +1,26 @@
+# Server Configuration
+server.port=8080
+spring.application.name=yuvi-labs
+
+# Database Configuration
+spring.datasource.url=jdbc:postgresql://localhost:5432/yuvilabs
+spring.datasource.username=your_username
+spring.datasource.password=your_password
+
+# API Keys (Replace with your own keys)
+openai.api.key=your_openai_api_key
+anthropic.api.key=your_anthropic_api_key
+google.cloud.credentials=path/to/your/credentials.json
+
+# JWT Configuration
+jwt.secret=your_jwt_secret_key
+jwt.expiration=86400000
+
+# Logging
+logging.level.root=INFO
+logging.level.ai.yuvi=DEBUG
+
+# Cors Configuration
+cors.allowed-origins=http://localhost:3000
+cors.allowed-methods=GET,POST,PUT,DELETE,OPTIONS
+cors.allowed-headers=* 
