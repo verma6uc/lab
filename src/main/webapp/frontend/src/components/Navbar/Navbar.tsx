@@ -11,14 +11,15 @@ import {
   List,
   ListItem,
   ListItemText,
-  Collapse,
+  Button,
   useTheme,
   useMediaQuery
 } from '@mui/material';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import MenuIcon from '@mui/icons-material/Menu';
 import CloseIcon from '@mui/icons-material/Close';
 import { styled } from '@mui/material/styles';
+import { authService } from '../../services/auth';
 
 const NavLink = styled(Link)(({ theme }) => ({
   color: 'rgba(255, 255, 255, 0.7)',
@@ -77,11 +78,22 @@ const navItems = [
 const Navbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const isAuthenticated = authService.isAuthenticated();
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
+  };
+
+  const handleAuthAction = () => {
+    if (isAuthenticated) {
+      authService.logout();
+      navigate('/');
+    } else {
+      navigate('/login');
+    }
   };
 
   const isActive = (path: string) => {
@@ -129,6 +141,28 @@ const Navbar = () => {
             </Link>
           </MobileNavItem>
         ))}
+        <MobileNavItem>
+          <Box
+            component="button"
+            onClick={handleAuthAction}
+            sx={{
+              width: '100%',
+              border: 'none',
+              background: 'rgba(0, 163, 255, 0.1)',
+              color: '#00A3FF',
+              padding: '12px 24px',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              fontSize: '1rem',
+              fontWeight: 500,
+              '&:hover': {
+                background: 'rgba(0, 163, 255, 0.2)',
+              }
+            }}
+          >
+            {isAuthenticated ? 'Sign Out' : 'Sign In'}
+          </Box>
+        </MobileNavItem>
       </List>
     </Box>
   );
@@ -175,8 +209,8 @@ const Navbar = () => {
               </Typography>
             </BrandLink>
 
-            <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
-              <Stack direction="row" spacing={1}>
+            <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center' }}>
+              <Stack direction="row" spacing={1} sx={{ mr: 3 }}>
                 {navItems.map((item) => (
                   <NavLink 
                     key={item.path}
@@ -187,6 +221,22 @@ const Navbar = () => {
                   </NavLink>
                 ))}
               </Stack>
+              <Button
+                onClick={handleAuthAction}
+                sx={{
+                  background: 'rgba(0, 163, 255, 0.1)',
+                  color: '#00A3FF',
+                  padding: '8px 24px',
+                  borderRadius: '8px',
+                  textTransform: 'none',
+                  fontWeight: 500,
+                  '&:hover': {
+                    background: 'rgba(0, 163, 255, 0.2)',
+                  }
+                }}
+              >
+                {isAuthenticated ? 'Sign Out' : 'Sign In'}
+              </Button>
             </Box>
 
             <IconButton
