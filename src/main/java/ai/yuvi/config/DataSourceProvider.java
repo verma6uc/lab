@@ -25,12 +25,7 @@ public class DataSourceProvider {
         String user = ConfigProperties.getProperty("database.username");
         String password = ConfigProperties.getProperty("database.password");
 
-        String minPoolSize = ConfigProperties.getProperty("c3p0.minPoolSize", "5");
-        String maxPoolSize = ConfigProperties.getProperty("c3p0.maxPoolSize", "100");
-        String acquireIncrement = ConfigProperties.getProperty("c3p0.acquireIncrement", "10");
-        String maxIdleTime = ConfigProperties.getProperty("c3p0.maxIdleTime", "1800");
-        String unreturnedConnTimeout = ConfigProperties.getProperty("c3p0.unreturnedConnectionTimeout", "30");
-        String debugUnreturned = ConfigProperties.getProperty("c3p0.debugUnreturnedConnectionStackTraces", "true");
+        
 
         try {
             ComboPooledDataSource cpds = new ComboPooledDataSource();
@@ -38,14 +33,7 @@ public class DataSourceProvider {
             cpds.setUser(user);
             cpds.setPassword(password);
 
-            cpds.setMinPoolSize(Integer.parseInt(minPoolSize));
-            cpds.setMaxPoolSize(Integer.parseInt(maxPoolSize));
-            cpds.setAcquireIncrement(Integer.parseInt(acquireIncrement));
-            cpds.setMaxIdleTime(Integer.parseInt(maxIdleTime));
-
-            cpds.setUnreturnedConnectionTimeout(Integer.parseInt(unreturnedConnTimeout));
-            cpds.setDebugUnreturnedConnectionStackTraces(Boolean.parseBoolean(debugUnreturned));
-
+        
             dataSource = cpds;
             LOGGER.info("DataSource initialized with c3p0 connection pool.");
         } catch (NumberFormatException e) {

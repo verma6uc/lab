@@ -3,6 +3,7 @@ package ai.yuvi.model;
 import java.time.ZonedDateTime;
 import java.util.List;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class User {
     private Long userId;
@@ -10,6 +11,8 @@ public class User {
     private Long companyId;
     private String name;
     private String email;
+    @JsonIgnore // Don't serialize password in JSON responses
+    private String password;
     private UserRole role;
     private UserStatus status;
     private ZonedDateTime lastActive;
@@ -38,6 +41,10 @@ public class User {
 
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
+
+    @JsonIgnore
+    public String getPassword() { return password; }
+    public void setPassword(String password) { this.password = password; }
 
     public UserRole getRole() { return role; }
     public void setRole(UserRole role) { this.role = role; }

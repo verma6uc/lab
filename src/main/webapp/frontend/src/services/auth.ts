@@ -2,9 +2,19 @@ import axios from 'axios';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
 
+// Configure axios defaults
+axios.defaults.withCredentials = true;
+axios.defaults.headers.common['Content-Type'] = 'application/json';
+
 export interface LoginCredentials {
   email: string;
   password: string;
+}
+
+export interface RegisterCredentials {
+  email: string;
+  password: string;
+  name: string;
 }
 
 export interface AuthResponse {
@@ -26,8 +36,56 @@ class AuthService {
         localStorage.setItem('user', JSON.stringify(response.data.user));
       }
       return response.data;
-    } catch (error) {
-      throw this.handleError(error);
+    } catch (error: any) {
+      if (error.response) {
+        throw new Error(error.response.data.message || 'Login failed');
+      }
+      throw new Error('Network error occurred');
+    }
+  }
+
+  async register(credentials: RegisterCredentials): Promise<AuthResponse> {
+    try {
+      const response = await axios.post(`${API_URL}/auth/register`, credentials);
+      if (response.data.token) {
+        localStorage.setItem('token', response.data.token);
+        localStorage.setItem('user', JSON.stringify(response.data.user));
+      }
+      return response.data;
+    } catch (error: any) {
+      if (error.response) {
+        throw new Error(error.response.data.message || 'Registration failed');
+      }
+      throw new Error('Network error occurred');
+    }
+  }
+
+  async changePassword(oldPassword: string, newPassword: string): Promise<void> {
+    try {
+      const user = this.getCurrentUser();
+      if (!user) throw new Error('User not authenticated');
+
+      await axios.post(`${API_URL}/auth/change-password`, {
+        userId: user.id,
+        oldPassword,
+        newPassword
+      });
+    } catch (error: any) {
+      if (error.response) {
+        throw new Error(error.response.data.message || 'Password change failed');
+      }
+      throw new Error('Network error occurred');
+    }
+  }
+
+  async resetPassword(email: string): Promise<void> {
+    try {
+      await axios.post(`${API_URL}/auth/reset-password`, { email });
+    } catch (error: any) {
+      if (error.response) {
+        throw new Error(error.response.data.message || 'Password reset failed');
+      }
+      throw new Error('Network error occurred');
     }
   }
 
@@ -50,21 +108,6 @@ class AuthService {
 
   getToken(): string | null {
     return localStorage.getItem('token');
-  }
-
-  private handleError(error: any): Error {
-    if (error.response) {
-      // The request was made and the server responded with a status code
-      // that falls out of the range of 2xx
-      const message = error.response.data.message || 'An error occurred';
-      return new Error(message);
-    } else if (error.request) {
-      // The request was made but no response was received
-      return new Error('No response from server');
-    } else {
-      // Something happened in setting up the request that triggered an Error
-      return new Error('Error setting up request');
-    }
   }
 }
 

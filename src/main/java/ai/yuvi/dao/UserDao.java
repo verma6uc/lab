@@ -7,8 +7,7 @@ import ai.yuvi.config.DataSourceProvider;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.JsonNode;
-import org.postgresql.util.PGobject;
-
+ 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,9 +22,9 @@ public class UserDao {
 
     public Long create(User user) {
         String sql = """
-            INSERT INTO "user" (id, company_id, name, email, role, status, avatar, 
+            INSERT INTO "user" (id, company_id, name, email, password, role, status, avatar, 
                               department, phone, location, bio, skills, preferences, social_links)
-            VALUES (?, ?, ?, ?, ?::user_role, ?::user_status, ?, ?, ?, ?, ?, ?, ?::jsonb, ?::jsonb)
+            VALUES (?, ?, ?, ?, ?, ?::user_role, ?::user_status, ?, ?, ?, ?, ?, ?, ?::jsonb, ?::jsonb)
             RETURNING user_id
         """;
 
@@ -37,6 +36,7 @@ public class UserDao {
             stmt.setLong(paramIndex++, user.getCompanyId());
             stmt.setString(paramIndex++, user.getName());
             stmt.setString(paramIndex++, user.getEmail());
+            stmt.setString(paramIndex++, user.getPassword());
             stmt.setString(paramIndex++, user.getRole().name());
             stmt.setString(paramIndex++, user.getStatus().getValue());
             stmt.setString(paramIndex++, user.getAvatar());
@@ -135,7 +135,7 @@ public class UserDao {
     public boolean update(User user) {
         String sql = """
             UPDATE "user" 
-            SET name = ?, email = ?, role = ?::user_role, status = ?::user_status,
+            SET name = ?, email = ?, password = ?, role = ?::user_role, status = ?::user_status,
                 avatar = ?, department = ?, phone = ?, location = ?, bio = ?,
                 skills = ?, preferences = ?::jsonb, social_links = ?::jsonb,
                 last_active = NOW()
@@ -148,6 +148,7 @@ public class UserDao {
             int paramIndex = 1;
             stmt.setString(paramIndex++, user.getName());
             stmt.setString(paramIndex++, user.getEmail());
+            stmt.setString(paramIndex++, user.getPassword());
             stmt.setString(paramIndex++, user.getRole().name());
             stmt.setString(paramIndex++, user.getStatus().getValue());
             stmt.setString(paramIndex++, user.getAvatar());
@@ -197,6 +198,7 @@ public class UserDao {
         user.setCompanyId(rs.getLong("company_id"));
         user.setName(rs.getString("name"));
         user.setEmail(rs.getString("email"));
+        user.setPassword(rs.getString("password"));
         user.setRole(UserRole.valueOf(rs.getString("role")));
         user.setStatus(UserStatus.fromString(rs.getString("status")));
         user.setLastActive(rs.getObject("last_active", Timestamp.class) != null ? 
@@ -236,14 +238,16 @@ public class UserDao {
         return user;
     }
 
-    private void setJsonbParameter(PreparedStatement stmt, int paramIndex, JsonNode jsonNode) throws SQLException {
-        if (jsonNode != null) {
-            PGobject jsonObject = new PGobject();
-            jsonObject.setType("jsonb");
-            jsonObject.setValue(jsonNode.toString());
-            stmt.setObject(paramIndex, jsonObject);
-        } else {
-            stmt.setNull(paramIndex, Types.OTHER);
-        }
+    private void setJsonbParameter(PreparedStatement stmt, int index, JsonNode jsonNode) throws SQLException {
+		/*
+		 * if (jsonNode != null) { PGobject jsonObject = new PGobject();
+		 * jsonObject.setType("jsonb"); jsonObject.setValue(jsonNode.toString());
+		 * stmt.setObject(index, jsonObject); } else { stmt.setNull(index, Types.OTHER);
+		 * }
+		 */
     }
+    
+    public static void main(String[] args) {
+		System.err.println(new UserDao().findByEmail("admin@yuvilabs.com").get().getEmail());
+	}
 } 

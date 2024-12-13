@@ -1,4 +1,5 @@
 package ai.yuvi.model;
+
 public class CompanyProduct {
     private long productId;
     private long companyId;

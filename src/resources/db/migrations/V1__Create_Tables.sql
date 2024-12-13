@@ -204,3 +204,13 @@ CREATE TABLE user_team (
     team_id BIGINT NOT NULL REFERENCES team(team_id) ON DELETE CASCADE,
     PRIMARY KEY (user_id, team_id)
 );
+
+
+-- Add password column to user table
+ALTER TABLE "user" ADD COLUMN IF NOT EXISTS password VARCHAR(255) NOT NULL DEFAULT '';
+
+-- Create index on email for faster lookups during authentication
+CREATE INDEX IF NOT EXISTS idx_user_email ON "user"(email);
+
+-- Add constraint to ensure email is unique
+ALTER TABLE "user" ADD CONSTRAINT uq_user_email UNIQUE (email);

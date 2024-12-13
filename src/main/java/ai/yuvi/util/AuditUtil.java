@@ -1,6 +1,8 @@
 package ai.yuvi.util;
 
 import java.time.OffsetDateTime;
+import java.time.ZonedDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,7 +30,7 @@ public class AuditUtil {
         log.setRecordId(recordId);
         log.setOperation(operation);
         log.setPerformedBy(performedBy);
-        log.setPerformedAt(OffsetDateTime.now());
+        log.setPerformedAt(OffsetDateTime.now().atZoneSameInstant(ZoneId.systemDefault()));
         return log;
     }
 

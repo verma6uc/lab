@@ -2,6 +2,7 @@ import React from 'react';
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import PublicLayout from '../components/Layout/PublicLayout';
 import MainLayout from '../components/Layout/MainLayout';
+import AdminLayout from '../components/Layout/AdminLayout';
 import Home from '../pages/Home';
 import Features from '../pages/Features';
 import Solutions from '../pages/Solutions';
@@ -11,9 +12,8 @@ import Journey from '../pages/Journey';
 import Login from '../pages/Login';
 import NotFound from '../pages/NotFound';
 import Dashboard from '../pages/Dashboard';
-import Teams from '../pages/Teams';
-import Users from '../pages/Users';
-import Conversations from '../pages/Conversations';
+import AdminDashboard from '../pages/admin/Dashboard';
+import Companies from '../pages/admin/Companies';
 
 // Auth guard component
 const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
@@ -89,19 +89,25 @@ export const router = createBrowserRouter([
       {
         path: '/dashboard',
         element: <Dashboard />,
+      }
+    ],
+  },
+  // Admin routes
+  {
+    element: (
+      <PrivateRoute>
+        <AdminLayout />
+      </PrivateRoute>
+    ),
+    children: [
+      {
+        path: '/admin',
+        element: <AdminDashboard />,
       },
       {
-        path: '/teams',
-        element: <Teams />,
-      },
-      {
-        path: '/users',
-        element: <Users />,
-      },
-      {
-        path: '/conversations',
-        element: <Conversations />,
-      },
+        path: '/admin/companies',
+        element: <Companies />,
+      }
     ],
   },
   // 404 route
