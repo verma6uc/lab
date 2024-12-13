@@ -14,6 +14,10 @@ import NotFound from '../pages/NotFound';
 import Dashboard from '../pages/Dashboard';
 import AdminDashboard from '../pages/admin/Dashboard';
 import Companies from '../pages/admin/Companies';
+import Users from '../pages/admin/Users';
+import LiveSessions from '../pages/admin/LiveSessions';
+import SecurityAudit from '../pages/admin/SecurityAudit';
+import Settings from '../pages/admin/Settings';
 
 // Auth guard component
 const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
@@ -107,7 +111,23 @@ export const router = createBrowserRouter([
       {
         path: '/admin/companies',
         element: <Companies />,
-      }
+      },
+      {
+        path: '/admin/users',
+        element: <Users />,
+      },
+      {
+        path: '/admin/live-sessions',
+        element: <LiveSessions />,
+      },
+      {
+        path: '/admin/security-audit',
+        element: <SecurityAudit />,
+      },
+      {
+        path: '/admin/settings',
+        element: <Settings />,
+      },
     ],
   },
   // 404 route

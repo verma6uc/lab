@@ -1,13 +1,19 @@
 import React from 'react';
 import { Card, CardContent, Typography, Button } from '@mui/material';
 import { Business as BusinessIcon } from '@mui/icons-material';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 interface DashboardCardProps {
   onCreate: () => void;
 }
 
 const DashboardCard: React.FC<DashboardCardProps> = ({ onCreate }) => {
+  const navigate = useNavigate();
+
+  const handleDashboardClick = () => {
+    navigate('/admin');
+  };
+
   return (
     <Card
       sx={{
@@ -21,7 +27,9 @@ const DashboardCard: React.FC<DashboardCardProps> = ({ onCreate }) => {
         color: 'white',
         borderRadius: 2,
         boxShadow: '0 4px 30px rgba(0, 0, 0, 0.1)',
+        cursor: 'pointer',
       }}
+      onClick={handleDashboardClick}
     >
       <BusinessIcon sx={{ color: 'primary.main', mr: 2 }} />
       <CardContent sx={{ flexGrow: 1 }}>
@@ -32,8 +40,10 @@ const DashboardCard: React.FC<DashboardCardProps> = ({ onCreate }) => {
       <Button
         variant="outlined"
         color="primary"
-        component={Link}
-        to="/admin"
+        onClick={(e) => {
+          e.stopPropagation();
+          onCreate();
+        }}
         sx={{
           borderColor: 'primary.main',
           color: 'primary.main',
