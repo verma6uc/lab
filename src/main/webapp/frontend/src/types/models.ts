@@ -146,4 +146,58 @@ export interface ApiResponse<T> {
     data: T;
     message?: string;
     error?: string;
+}
+
+export interface Session {
+  sessionId: string;
+  userId: number;
+  companyId: number;
+  
+  // Session Status
+  status: 'active' | 'idle' | 'disconnected';
+  startedAt: string;
+  lastActivityAt: string;
+  endedAt?: string;
+  durationSeconds: number;
+  
+  // Device Information
+  deviceType: 'desktop' | 'mobile' | 'tablet';
+  browser: string;
+  browserVersion: string;
+  osType: string;
+  osVersion: string;
+  deviceId: string;
+  
+  // Location Information
+  ipAddress: string;
+  city: string;
+  country: string;
+  latitude: number;
+  longitude: number;
+  
+  // Technical Details
+  userAgent: string;
+  screenResolution: string;
+  language: string;
+  timezone: string;
+  
+  // Security & Performance
+  isAuthenticated: boolean;
+  isSecureConnection: boolean;
+  connectionType: string;
+  networkSpeed: string;
+  
+  // Page Navigation
+  currentPage: string;
+  previousPage: string;
+  pageViews: number;
+  
+  // Analytics
+  totalClicks: number;
+  totalActions: number;
+  bounceRate: number;
+  
+  // System Columns
+  createdAt: string;
+  updatedAt: string;
 } 

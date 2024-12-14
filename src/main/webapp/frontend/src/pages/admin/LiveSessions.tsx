@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   Box,
   Grid,
@@ -48,7 +48,8 @@ import {
   Cell,
 } from 'recharts';
 import AdminPageWrapper from '../../components/admin/AdminPageWrapper';
-import { mockSessions, getSessionStats, Session } from '../../mocks/liveSessions';
+import { sessionService, SessionFilters, SessionStats } from '../../services/sessionService';
+import { Session } from '../../types/models';
 import '../../utils/leaflet-icons';
 import PageContainer from '../../components/admin/PageContainer';
 
@@ -74,17 +75,6 @@ const formatLastActivity = (timestamp: string) => {
     minute: '2-digit',
   });
 };
-
-interface FilterState {
-  status: string[];
-  browser: string[];
-  deviceType: string[];
-  duration: {
-    min: number;
-    max: number;
-  };
-  searchTerm: string;
-}
 
 const SessionCard: React.FC<{ session: Session }> = ({ session }) => (
   <Card
@@ -225,13 +215,15 @@ const SessionCard: React.FC<{ session: Session }> = ({ session }) => (
 );
 
 const LiveSessions: React.FC = () => {
+  const [sessions, setSessions] = useState<Session[]>([]);
+  const [stats, setStats] = useState<SessionStats | null>(null);
+  const [loading, setLoading] = useState(true);
   const [selectedLocation, setSelectedLocation] = useState<string | null>(null);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [filters, setFilters] = useState<FilterState>({
+  const [filters, setFilters] = useState<SessionFilters>({
     status: [],
     browser: [],
     deviceType: [],
-    duration: { min: 0, max: 120 },
     searchTerm: '',
   });
 
@@ -241,8 +233,51 @@ const LiveSessions: React.FC = () => {
     deviceType: ['desktop', 'mobile', 'tablet'],
   };
 
+  useEffect(() => {
+    fetchSessions();
+    fetchStats();
+  }, [filters]);
+
+  const fetchSessions = async () => {
+    try {
+      setLoading(true);
+      const data = await sessionService.getLiveSessions(filters);
+      setSessions(data);
+    } catch (error) {
+      console.error('Error fetching sessions:', error);
+      // Handle error (show notification, etc.)
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchStats = async () => {
+    try {
+      const data = await sessionService.getSessionStats();
+      setStats(data);
+    } catch (error) {
+      console.error('Error fetching stats:', error);
+      // Handle error
+    }
+  };
+
+  const handleExport = async () => {
+    try {
+      const blob = await sessionService.exportSessions(filters);
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'sessions-export.csv';
+      a.click();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error exporting sessions:', error);
+      // Handle error
+    }
+  };
+
   const filteredSessions = useMemo(() => {
-    let sessions = mockSessions;
+    let sessions = this.sessions;
 
     if (selectedLocation) {
       sessions = sessions.filter(
@@ -285,8 +320,6 @@ const LiveSessions: React.FC = () => {
 
     return sessions;
   }, [selectedLocation, filters]);
-
-  const stats = useMemo(() => getSessionStats(filteredSessions), [filteredSessions]);
 
   const MapView: React.FC = () => {
     const [isMapReady, setIsMapReady] = useState(false);
