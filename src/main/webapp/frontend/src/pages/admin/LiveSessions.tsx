@@ -277,40 +277,35 @@ const LiveSessions: React.FC = () => {
   };
 
   const filteredSessions = useMemo(() => {
-    let sessions = this.sessions;
+    let filteredSessions = sessions;
 
     if (selectedLocation) {
-      sessions = sessions.filter(
+      filteredSessions = filteredSessions.filter(
         session => session.location.city === selectedLocation
       );
     }
 
     if (filters.status.length > 0) {
-      sessions = sessions.filter(session => 
+      filteredSessions = filteredSessions.filter(session => 
         filters.status.includes(session.status)
       );
     }
 
     if (filters.browser.length > 0) {
-      sessions = sessions.filter(session => 
+      filteredSessions = filteredSessions.filter(session => 
         filters.browser.includes(session.browser)
       );
     }
 
     if (filters.deviceType.length > 0) {
-      sessions = sessions.filter(session => 
+      filteredSessions = filteredSessions.filter(session => 
         filters.deviceType.includes(session.deviceType)
       );
     }
 
-    sessions = sessions.filter(session => 
-      session.duration >= filters.duration.min && 
-      session.duration <= filters.duration.max
-    );
-
     if (filters.searchTerm) {
       const searchLower = filters.searchTerm.toLowerCase();
-      sessions = sessions.filter(session => 
+      filteredSessions = filteredSessions.filter(session => 
         session.location.city.toLowerCase().includes(searchLower) ||
         session.location.country.toLowerCase().includes(searchLower) ||
         session.ipAddress.includes(searchLower) ||
@@ -318,8 +313,8 @@ const LiveSessions: React.FC = () => {
       );
     }
 
-    return sessions;
-  }, [selectedLocation, filters]);
+    return filteredSessions;
+  }, [sessions, selectedLocation, filters]);
 
   const MapView: React.FC = () => {
     const [isMapReady, setIsMapReady] = useState(false);
@@ -384,76 +379,82 @@ const LiveSessions: React.FC = () => {
     );
   };
 
-  const StatisticsView: React.FC = () => (
-    <Grid container spacing={3} sx={{ mb: 4 }}>
-      <Grid item xs={12} md={6}>
-        <Card 
-          elevation={0}
-          sx={{ 
-            background: 'rgba(255, 255, 255, 0.05)',
-            backdropFilter: 'blur(10px)',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
-          }}
-        >
-          <CardContent>
-            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-              <Typography variant="h6">Sessions by Status</Typography>
-            </Box>
-            <PieChart width={400} height={300}>
-              <Pie
-                data={Object.entries(stats.byStatus).map(([name, value]) => ({
-                  name,
-                  value,
-                }))}
-                cx={200}
-                cy={150}
-                labelLine={false}
-                outerRadius={80}
-                fill="#8884d8"
-                dataKey="value"
-              >
-                {Object.entries(stats.byStatus).map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                ))}
-              </Pie>
-              <RechartsTooltip contentStyle={{ background: '#1a2035', border: 'none' }} />
-              <Legend />
-            </PieChart>
-          </CardContent>
-        </Card>
-      </Grid>
+  const StatisticsView: React.FC = () => {
+    if (!stats) {
+      return null; // or return a loading state
+    }
 
-      <Grid item xs={12} md={6}>
-        <Card 
-          elevation={0}
-          sx={{ 
-            background: 'rgba(255, 255, 255, 0.05)',
-            backdropFilter: 'blur(10px)',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
-          }}
-        >
-          <CardContent>
-            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-              <Typography variant="h6">Sessions by Device</Typography>
-            </Box>
-            <BarChart width={400} height={300} data={
-              Object.entries(stats.byDevice).map(([name, value]) => ({
-                name,
-                sessions: value,
-              }))
-            }>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-              <XAxis dataKey="name" stroke="#fff" />
-              <YAxis stroke="#fff" />
-              <RechartsTooltip contentStyle={{ background: '#1a2035', border: 'none' }} />
-              <Legend />
-              <Bar dataKey="sessions" fill="#8884d8" />
-            </BarChart>
-          </CardContent>
-        </Card>
+    return (
+      <Grid container spacing={3} sx={{ mb: 4 }}>
+        <Grid item xs={12} md={6}>
+          <Card 
+            elevation={0}
+            sx={{ 
+              background: 'rgba(255, 255, 255, 0.05)',
+              backdropFilter: 'blur(10px)',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+            }}
+          >
+            <CardContent>
+              <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                <Typography variant="h6">Sessions by Status</Typography>
+              </Box>
+              <PieChart width={400} height={300}>
+                <Pie
+                  data={Object.entries(stats.byStatus || {}).map(([name, value]) => ({
+                    name,
+                    value,
+                  }))}
+                  cx={200}
+                  cy={150}
+                  labelLine={false}
+                  outerRadius={80}
+                  fill="#8884d8"
+                  dataKey="value"
+                >
+                  {Object.entries(stats.byStatus || {}).map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
+                <RechartsTooltip contentStyle={{ background: '#1a2035', border: 'none' }} />
+                <Legend />
+              </PieChart>
+            </CardContent>
+          </Card>
+        </Grid>
+
+        <Grid item xs={12} md={6}>
+          <Card 
+            elevation={0}
+            sx={{ 
+              background: 'rgba(255, 255, 255, 0.05)',
+              backdropFilter: 'blur(10px)',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+            }}
+          >
+            <CardContent>
+              <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                <Typography variant="h6">Sessions by Device</Typography>
+              </Box>
+              <BarChart width={400} height={300} data={
+                Object.entries(stats.byDevice || {}).map(([name, value]) => ({
+                  name,
+                  sessions: value,
+                }))
+              }>
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
+                <XAxis dataKey="name" stroke="#fff" />
+                <YAxis stroke="#fff" />
+                <RechartsTooltip contentStyle={{ background: '#1a2035', border: 'none' }} />
+                <Legend />
+                <Bar dataKey="sessions" fill="#8884d8" />
+              </BarChart>
+            </CardContent>
+          </Card>
+        </Grid>
       </Grid>
-    </Grid>
-  );
+    );
+  };
 
   const FilterMenu: React.FC = () => (
     <>
