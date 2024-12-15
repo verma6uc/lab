@@ -1,0 +1,24 @@
+package ai.yuvi.modules.organization.enums;
+
+public enum Industry {
+    TECHNOLOGY,
+    HEALTHCARE,
+    FINANCE,
+    RETAIL,
+    MANUFACTURING,
+    EDUCATION,
+    ENTERTAINMENT,
+    REAL_ESTATE,
+    ENERGY,
+    TRANSPORTATION,
+    CONSULTING,
+    TELECOMMUNICATIONS,
+    AGRICULTURE,
+    CONSTRUCTION,
+    HOSPITALITY,
+    MEDIA,
+    AUTOMOTIVE,
+    AEROSPACE,
+    BIOTECHNOLOGY,
+    OTHER
+}
