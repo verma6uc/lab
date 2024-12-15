@@ -1,151 +1,346 @@
-import React, { useState, useEffect } from 'react';
-import {
-  Box,
-  Typography,
-  Grid,
-  CircularProgress,
-  Alert,
-} from '@mui/material';
-import CompanyCard from '../../components/company/CompanyCard';
-import CompanyDrawer from '../../components/company/CompanyDrawer';
-import { Company, Industry } from '../../types/models';
-import { companyService } from '../../services/company';
-import { Business } from '@mui/icons-material';
-import PageContainer from '../../components/admin/PageContainer';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Box, Typography, Grid } from '@mui/material';
+import PageContainer from '../../components/shared/PageContainer';
+import CompanyFilters from '../../components/admin/companies/CompanyFilters';
+import CompanyCard from '../../components/admin/companies/CompanyCard';
+import CompanyEditModal from '../../components/admin/companies/CompanyEditModal';
+import StyledButton from '../../components/shared/StyledButton';
+import { Add as AddIcon } from '@mui/icons-material';
+import { Company } from '../../types/company';
 
-// Helper function to format industry names
-const formatIndustryName = (industry: string): string => {
-  if (industry === 'ALL') return 'All Industries';
-  
-  // Convert SNAKE_CASE to Title Case
-  return industry
-    .split('_')
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-    .join(' ');
-};
-
-const Companies = () => {
-  const [companies, setCompanies] = useState<Company[]>([]);
-  const [filteredCompanies, setFilteredCompanies] = useState<Company[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [selectedCompany, setSelectedCompany] = useState<Company | null>(null);
-  const [drawerOpen, setDrawerOpen] = useState(false);
-  const [selectedIndustry, setSelectedIndustry] = useState<Industry | 'ALL'>('ALL');
-
-  useEffect(() => {
-    fetchCompanies();
-  }, []);
-
-  const fetchCompanies = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const response = await companyService.getAll();
-      if (Array.isArray(response)) {
-        setCompanies(response);
-        setFilteredCompanies(response);
-      } else {
-        setCompanies([]);
-        setFilteredCompanies([]);
-        setError('Invalid data format received from server');
+// Mock data based on database schema
+const mockCompanies: Company[] = [
+  {
+    id: 1,
+    name: 'TechCorp',
+    industry: 'TECHNOLOGY',
+    type: 'Enterprise',
+    size: 500,
+    bio: 'Leading technology solutions provider specializing in enterprise software.',
+    website: 'https://techcorp.com',
+    linkedin_url: 'https://linkedin.com/company/techcorp',
+    twitter_url: 'https://twitter.com/techcorp',
+    github_url: 'https://github.com/techcorp',
+    contact_email: 'contact@techcorp.com',
+    contact_phone: '+1 (555) 123-4567',
+    contact_address: '123 Tech Street, San Francisco, CA',
+    status: 'active',
+    branding: {
+      primary_color: '#00A3FF',
+      secondary_color: '#2ecc71',
+      font_family: 'Inter',
+    },
+    products: [
+      { id: 1, name: 'TechCRM', description: 'Enterprise CRM Solution' },
+      { id: 2, name: 'TechAnalytics', description: 'Business Intelligence Platform' },
+    ],
+    applications: [
+      {
+        id: 1,
+        name: 'Sales Dashboard',
+        description: 'Real-time sales analytics and reporting dashboard',
+        stage: 'development',
+        status: 'active',
+        pending_approval: true,
+        feedback_required: false,
+        owner: {
+          id: 1,
+          name: 'John Doe',
+          role: 'Product Owner'
+        },
+        last_updated: '2024-01-15T10:30:00Z',
+        estimated_completion: '2024-02-15T00:00:00Z',
+        created_at: '2024-01-01T00:00:00Z'
+      },
+      {
+        id: 2,
+        name: 'Customer Portal',
+        description: 'Self-service portal for customer account management',
+        stage: 'visual_prd',
+        status: 'active',
+        pending_approval: false,
+        feedback_required: true,
+        owner: {
+          id: 2,
+          name: 'Jane Smith',
+          role: 'Project Manager'
+        },
+        last_updated: '2024-01-14T15:45:00Z',
+        estimated_completion: '2024-03-01T00:00:00Z',
+        created_at: '2024-01-05T00:00:00Z'
       }
-    } catch (error) {
-      console.error('Error fetching companies:', error);
-      setError('Failed to fetch companies. Please try again later.');
-      setCompanies([]);
-      setFilteredCompanies([]);
-    } finally {
-      setLoading(false);
-    }
-  };
+    ],
+    created_at: '2024-01-15T00:00:00Z',
+    products_count: 2,
+    screenshots_count: 5,
+  },
+  {
+    id: 2,
+    name: 'BioMed Solutions',
+    industry: 'HEALTHCARE',
+    type: 'Startup',
+    size: 50,
+    bio: 'Innovative healthcare technology company focused on patient care solutions.',
+    website: 'https://biomed.com',
+    linkedin_url: 'https://linkedin.com/company/biomed',
+    contact_email: 'info@biomed.com',
+    contact_phone: '+1 (555) 987-6543',
+    status: 'active',
+    products: [
+      { id: 3, name: 'PatientCare Pro', description: 'Healthcare Management System' },
+    ],
+    applications: [
+      {
+        id: 3,
+        name: 'Patient Records',
+        description: 'Electronic health records management system',
+        stage: 'prototype',
+        status: 'active',
+        pending_approval: false,
+        feedback_required: false,
+        owner: {
+          id: 3,
+          name: 'Sarah Johnson',
+          role: 'Product Manager'
+        },
+        last_updated: '2024-01-14T09:15:00Z',
+        estimated_completion: '2024-03-15T00:00:00Z',
+        created_at: '2024-01-14T00:00:00Z'
+      }
+    ],
+    created_at: '2024-01-14T00:00:00Z',
+    products_count: 1,
+    screenshots_count: 3,
+  },
+  {
+    id: 3,
+    name: 'EcoEnergy',
+    industry: 'ENERGY',
+    size: 1000,
+    bio: 'Sustainable energy solutions for a greener future.',
+    website: 'https://ecoenergy.com',
+    contact_email: 'contact@ecoenergy.com',
+    status: 'inactive',
+    products: [],
+    applications: [
+      {
+        id: 4,
+        name: 'Energy Monitor',
+        description: 'Real-time energy consumption monitoring',
+        stage: 'memory',
+        status: 'inactive',
+        pending_approval: false,
+        feedback_required: true,
+        owner: {
+          id: 4,
+          name: 'Mike Brown',
+          role: 'Business Analyst'
+        },
+        last_updated: '2024-01-13T14:20:00Z',
+        created_at: '2024-01-13T00:00:00Z'
+      }
+    ],
+    created_at: '2024-01-13T00:00:00Z',
+    products_count: 0,
+    screenshots_count: 0,
+  },
+];
 
-  const handleEditClick = (company: Company) => {
-    console.log('Edit company:', company);
-  };
+interface Filters {
+  industry?: string;
+  size?: string;
+  status?: 'active' | 'inactive';
+  hasProducts?: boolean;
+  hasBranding?: boolean;
+  sortBy: string;
+}
 
-  const handleViewClick = (company: Company) => {
-    setSelectedCompany(company);
-    setDrawerOpen(true);
-  };
+const Companies: React.FC = () => {
+  const navigate = useNavigate();
+  const [companies, setCompanies] = useState<Company[]>(mockCompanies);
+  const [filteredCompanies, setFilteredCompanies] = useState<Company[]>(mockCompanies);
+  const [filters, setFilters] = useState<Filters>({
+    sortBy: 'name',
+  });
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [selectedCompany, setSelectedCompany] = useState<Company | undefined>();
 
-  const handleDrawerClose = () => {
-    setDrawerOpen(false);
-    setSelectedCompany(null);
-  };
-
-  const handleAddClick = () => {
-    console.log('Add new company');
-  };
-
-  const handleSearch = (value: string) => {
-    const searchTerm = value.toLowerCase();
-    const filtered = companies.filter(company => 
-      company.name.toLowerCase().includes(searchTerm) ||
-      company.description?.toLowerCase().includes(searchTerm) ||
-      company.industry.toLowerCase().includes(searchTerm)
+  const handleSearch = (query: string) => {
+    const searchResults = companies.filter(company => 
+      company.name.toLowerCase().includes(query.toLowerCase()) ||
+      company.industry.toLowerCase().includes(query.toLowerCase()) ||
+      company.bio?.toLowerCase().includes(query.toLowerCase()) ||
+      company.contact_email?.toLowerCase().includes(query.toLowerCase())
     );
+    applyFilters(searchResults);
+  };
+
+  const applyFilters = (companies: Company[]) => {
+    let filtered = [...companies];
+
+    if (filters.industry) {
+      filtered = filtered.filter(company => 
+        company.industry === filters.industry
+      );
+    }
+
+    if (filters.size) {
+      const [min, max] = filters.size.split('-').map(n => parseInt(n));
+      filtered = filtered.filter(company => {
+        if (max) {
+          return company.size >= min && company.size <= max;
+        }
+        return company.size >= min;
+      });
+    }
+
+    if (filters.status) {
+      filtered = filtered.filter(company => 
+        company.status === filters.status
+      );
+    }
+
+    if (filters.hasProducts) {
+      filtered = filtered.filter(company => 
+        company.products.length > 0
+      );
+    }
+
+    if (filters.hasBranding) {
+      filtered = filtered.filter(company => 
+        company.branding !== undefined
+      );
+    }
+
+    // Sort companies
+    filtered.sort((a, b) => {
+      switch (filters.sortBy) {
+        case 'name':
+          return a.name.localeCompare(b.name);
+        case 'created':
+          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+        case 'size':
+          return b.size - a.size;
+        case 'industry':
+          return a.industry.localeCompare(b.industry);
+        default:
+          return 0;
+      }
+    });
+
     setFilteredCompanies(filtered);
   };
 
-  const handleFilter = (value: string) => {
-    const industry = value as Industry | 'ALL';
-    setSelectedIndustry(industry);
-    
-    if (industry === 'ALL') {
-      setFilteredCompanies(companies);
-    } else {
-      const filtered = companies.filter(company => company.industry === industry);
-      setFilteredCompanies(filtered);
-    }
+  const handleFilterChange = (newFilters: Filters) => {
+    setFilters(newFilters);
+    applyFilters(companies);
   };
 
-  // Create filter options from Industry enum with formatted names
-  const filterOptions = ['ALL', ...Object.values(Industry)].map(industry => ({
-    value: industry,
-    label: formatIndustryName(industry)
-  }));
+  const handleEdit = (id: number) => {
+    const company = companies.find(c => c.id === id);
+    setSelectedCompany(company);
+    setEditModalOpen(true);
+  };
+
+  const handleDelete = (id: number) => {
+    const updatedCompanies = companies.filter(c => c.id !== id);
+    setCompanies(updatedCompanies);
+    applyFilters(updatedCompanies);
+  };
+
+  const handleStatusChange = (id: number) => {
+    const updatedCompanies = companies.map(company => {
+      if (company.id === id) {
+        return {
+          ...company,
+          status: company.status === 'active' ? 'inactive' as const : 'active' as const,
+        };
+      }
+      return company;
+    });
+    setCompanies(updatedCompanies);
+    applyFilters(updatedCompanies);
+  };
+
+  const handleAddNew = () => {
+    setSelectedCompany(undefined);
+    setEditModalOpen(true);
+  };
+
+  const handleViewDetails = (id: number) => {
+    navigate(`/admin/companies/${id}`);
+  };
 
   return (
-    <PageContainer
-      icon={<Business />}
-      title="Companies"
-      onSearch={handleSearch}
-      onFilter={handleFilter}
-      onAdd={handleAddClick}
-      addButtonLabel="Add Company"
-      filterOptions={filterOptions}
-      searchPlaceholder="Search companies..."
-    >
-      {loading ? (
-        <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
-          <CircularProgress sx={{ color: 'primary.main' }} />
+    <PageContainer>
+      <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <Box>
+          <Typography variant="h4" sx={{ color: 'white', mb: 2, fontWeight: 600 }}>
+            Companies
+          </Typography>
+          <Typography sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
+            Manage and monitor registered companies
+          </Typography>
         </Box>
-      ) : error ? (
-        <Alert severity="error" sx={{ mb: 3 }}>{error}</Alert>
-      ) : filteredCompanies.length === 0 ? (
-        <Alert severity="info" sx={{ mb: 3 }}>No companies found.</Alert>
-      ) : (
-        <Grid container spacing={3}>
-          {filteredCompanies.map((company) => (
-            <Grid item xs={12} sm={6} md={4} key={company.id}>
+
+        <StyledButton
+          buttonType="primary"
+          startIcon={<AddIcon />}
+          onClick={handleAddNew}
+        >
+          Add New Company
+        </StyledButton>
+      </Box>
+
+      <CompanyFilters
+        onSearch={handleSearch}
+        onFilterChange={handleFilterChange}
+        activeFilters={filters}
+      />
+
+      <Grid container spacing={3}>
+        {filteredCompanies.map(company => (
+          <Grid item xs={12} md={6} lg={4} key={company.id}>
+            <Box 
+              onClick={() => handleViewDetails(company.id)}
+              sx={{ cursor: 'pointer' }}
+            >
               <CompanyCard
                 company={company}
-                onEdit={handleEditClick}
-                onView={() => handleViewClick(company)}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+                onStatusChange={handleStatusChange}
               />
-            </Grid>
-          ))}
-        </Grid>
+            </Box>
+          </Grid>
+        ))}
+      </Grid>
+
+      {filteredCompanies.length === 0 && (
+        <Box 
+          sx={{ 
+            textAlign: 'center',
+            py: 8,
+            color: 'rgba(255, 255, 255, 0.5)',
+          }}
+        >
+          <Typography variant="h6">
+            No companies found matching your criteria
+          </Typography>
+          <Typography>
+            Try adjusting your filters or search query
+          </Typography>
+        </Box>
       )}
-      
-      <CompanyDrawer
+
+      <CompanyEditModal
+        open={editModalOpen}
+        onClose={() => setEditModalOpen(false)}
         company={selectedCompany}
-        open={drawerOpen}
-        onClose={handleDrawerClose}
       />
     </PageContainer>
   );
 };
 
-export default Companies; 
+export default Companies;

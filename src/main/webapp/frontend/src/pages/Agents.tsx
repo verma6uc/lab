@@ -170,7 +170,7 @@ const Agents: React.FC = () => {
           position: 'relative', 
           zIndex: 1,
           width: '100%',
-          px: { xs: 2, sm: 4, md: 6 },
+          px: { xs: 1, sm: 2, md: 3 },
           pt: '120px',
           pb: '80px',
           display: 'flex',
@@ -178,7 +178,7 @@ const Agents: React.FC = () => {
           alignItems: 'center',
         }}
       >
-        <Box sx={{ width: '100%', maxWidth: '1600px' }}>
+        <Box sx={{ width: '98%' }}>
           <Box sx={{ textAlign: 'center', mb: 8 }}>
             <GradientText variant="h2" sx={{ mb: 3, fontWeight: 700, fontSize: '4rem' }}>
               Meet Our Asimov-Inspired AI Agents

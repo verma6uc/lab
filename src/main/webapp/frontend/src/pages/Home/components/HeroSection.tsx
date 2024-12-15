@@ -1,138 +1,148 @@
 import React from 'react';
-import { Box, Typography, Button } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
-import { keyframes } from '@mui/system';
-
-const fadeIn = keyframes`
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-`;
-
-const glow = keyframes`
-  0% {
-    text-shadow: 0 0 20px rgba(0, 163, 255, 0.3);
-  }
-  50% {
-    text-shadow: 0 0 30px rgba(0, 163, 255, 0.5);
-  }
-  100% {
-    text-shadow: 0 0 20px rgba(0, 163, 255, 0.3);
-  }
-`;
+import { Box, Typography, Button, Grid } from '@mui/material';
+import ParticleBackground from '../../../components/ParticleBackground';
 
 const HeroSection: React.FC = () => {
-  const navigate = useNavigate();
-
   return (
-    <Box 
-      sx={{ 
-        width: '100%', 
-        pt: { xs: 12, md: 16 }, 
-        pb: { xs: 10, md: 12 },
-        px: { xs: 2, sm: 4, md: 6 },
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        position: 'relative',
-        overflow: 'hidden',
-        bgcolor: 'rgba(2, 9, 20, 0.4)',
-        backdropFilter: 'blur(10px)',
-        pointerEvents: 'none',
-      }}
-    >
-      <Box sx={{ width: '100%', maxWidth: '1600px' }}>
-        <Box sx={{ 
-          textAlign: 'center', 
-          mb: { xs: 8, md: 10 },
-          animation: `${fadeIn} 1s ease-out`,
-        }}>
-          <Typography
-            variant="h1"
-            sx={{
-              fontSize: { xs: '2.5rem', md: '4rem' },
-              fontWeight: 700,
-              color: '#00A3FF',
-              mb: 3,
-              animation: `${glow} 3s infinite ease-in-out`,
-              textShadow: '0 0 20px rgba(0, 163, 255, 0.3)',
-              position: 'relative',
-              '&::after': {
-                content: '""',
-                position: 'absolute',
-                bottom: '-10px',
-                left: '50%',
-                transform: 'translateX(-50%)',
-                width: '60px',
-                height: '2px',
-                background: 'linear-gradient(90deg, rgba(0, 163, 255, 0) 0%, rgba(0, 163, 255, 0.5) 50%, rgba(0, 163, 255, 0) 100%)',
-              },
-            }}
-          >
-            Creator Labs
-          </Typography>
+    <Box sx={{ 
+      position: 'relative', 
+      minHeight: '100vh', 
+      display: 'flex', 
+      alignItems: 'center',
+      pt: { xs: 12, md: 16 }, 
+      pb: { xs: 8, md: 10 },
+      px: { xs: 1, sm: 2, md: 3 },
+    }}>
+      <ParticleBackground />
+      <Grid container spacing={4} sx={{ position: 'relative' }}>
+        <Grid item xs={12} md={10} sx={{ mx: 'auto', textAlign: 'center' }}>
+          <Box sx={{ mb: 4 }}>
+            <Typography
+              component="span"
+              sx={{
+                fontSize: { xs: '1.5rem', md: '2rem' },
+                fontWeight: 500,
+                color: 'rgba(255, 255, 255, 0.9)',
+                display: 'block',
+                mb: 1,
+              }}
+            >
+              From
+            </Typography>
+            <Typography
+              component="span"
+              sx={{
+                fontSize: { xs: '2rem', md: '2.5rem' },
+                fontWeight: 700,
+                color: '#4A9EFF',
+                display: 'block',
+                mb: 1,
+              }}
+            >
+              Software-as-a-Service
+            </Typography>
+            <Typography
+              component="span"
+              sx={{
+                fontSize: { xs: '1.5rem', md: '2rem' },
+                fontWeight: 500,
+                color: 'rgba(255, 255, 255, 0.9)',
+                display: 'block',
+                mb: 1,
+              }}
+            >
+              to
+            </Typography>
+            <Typography
+              component="span"
+              sx={{
+                fontSize: { xs: '2.5rem', md: '3.5rem' },
+                fontWeight: 700,
+                background: 'linear-gradient(135deg, #00A3FF 0%, #0066FF 100%)',
+                backgroundClip: 'text',
+                textFillColor: 'transparent',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                textShadow: '0 0 20px rgba(0, 163, 255, 0.3)',
+                mb: 3,
+                display: 'block',
+              }}
+            >
+              Service-as-a-Software
+            </Typography>
+          </Box>
           <Typography
             variant="h2"
             sx={{
               fontSize: { xs: '1.25rem', md: '1.5rem' },
+              fontWeight: 500,
+              color: '#00A3FF',
+              mb: 3,
+              lineHeight: 1.6,
+            }}
+          >
+            Beyond tools, towards complete autonomous service experiences
+          </Typography>
+          <Typography
+            variant="body1"
+            sx={{
+              fontSize: { xs: '1rem', md: '1.125rem' },
               color: 'rgba(255, 255, 255, 0.7)',
-              mb: 6,
+              mb: 5,
               maxWidth: '800px',
               mx: 'auto',
-              lineHeight: 1.6,
-              animation: `${fadeIn} 1s ease-out 0.3s both`,
+              lineHeight: 1.8,
             }}
           >
-            Transform your ideas into fully realized products with our AI-powered platform
+            While SaaS revolutionized software delivery, we're pioneering the next evolution: 
+            a platform that doesn't just provide tools—it delivers entire outcomes. From concept 
+            to execution, our AI orchestrates complete solutions with minimal human intervention.
           </Typography>
-          <Button
-            variant="contained"
-            size="large"
-            onClick={() => navigate('/auth/register')}
-            sx={{
-              bgcolor: 'rgba(0, 163, 255, 0.1)',
-              pointerEvents: 'auto',
-              '&:hover': {
-                bgcolor: 'rgba(0, 163, 255, 0.2)',
-                transform: 'translateY(-4px)',
-                boxShadow: '0 4px 20px rgba(0, 163, 255, 0.3)',
-              },
-              px: 6,
-              py: 2,
-              borderRadius: 2,
-              textTransform: 'none',
-              fontSize: '1.1rem',
-              boxShadow: '0 0 20px rgba(0, 163, 255, 0.3)',
-              transition: 'all 0.3s ease-in-out',
-              animation: `${fadeIn} 1s ease-out 0.6s both`,
-              position: 'relative',
-              overflow: 'hidden',
-              border: '1px solid rgba(0, 163, 255, 0.3)',
-              color: '#00A3FF',
-              '&::before': {
-                content: '""',
-                position: 'absolute',
-                top: 0,
-                left: '-100%',
-                width: '100%',
-                height: '100%',
-                background: 'linear-gradient(90deg, transparent 0%, rgba(0, 163, 255, 0.2) 50%, transparent 100%)',
-                transition: 'left 0.5s ease-in-out',
-              },
-              '&:hover::before': {
-                left: '100%',
-              },
-            }}
-          >
-            Start Creating
-          </Button>
-        </Box>
-      </Box>
+          <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center' }}>
+            <Button
+              variant="contained"
+              size="large"
+              sx={{
+                background: 'linear-gradient(135deg, #00A3FF 0%, #0066FF 100%)',
+                color: 'white',
+                px: 4,
+                py: 1.5,
+                fontSize: '1.1rem',
+                textTransform: 'none',
+                borderRadius: 2,
+                '&:hover': {
+                  background: 'linear-gradient(135deg, #0066FF 0%, #0052CC 100%)',
+                  transform: 'translateY(-2px)',
+                  boxShadow: '0 8px 20px rgba(0, 102, 255, 0.3)',
+                },
+                transition: 'all 0.3s ease-in-out',
+              }}
+            >
+              Experience the Future
+            </Button>
+            <Button
+              variant="outlined"
+              size="large"
+              sx={{
+                color: '#00A3FF',
+                borderColor: 'rgba(0, 163, 255, 0.5)',
+                px: 4,
+                py: 1.5,
+                fontSize: '1.1rem',
+                textTransform: 'none',
+                borderRadius: 2,
+                '&:hover': {
+                  borderColor: '#00A3FF',
+                  bgcolor: 'rgba(0, 163, 255, 0.1)',
+                },
+                transition: 'all 0.3s ease-in-out',
+              }}
+            >
+              Learn More
+            </Button>
+          </Box>
+        </Grid>
+      </Grid>
     </Box>
   );
 };

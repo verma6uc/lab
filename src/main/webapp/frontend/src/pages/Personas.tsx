@@ -11,6 +11,11 @@ interface PersonaCardProps {
   persona: Persona;
 }
 
+interface Challenge {
+  title: string;
+  description: string;
+}
+
 const PersonaCard: React.FC<PersonaCardProps> = ({ persona }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -93,7 +98,7 @@ const PersonaCard: React.FC<PersonaCardProps> = ({ persona }) => {
         >
           Key Challenges
         </Typography>
-        {persona.challenges.map((challenge, idx) => (
+        {persona.challenges.map((challenge: Challenge, idx: number) => (
           <Box 
             key={idx} 
             sx={{ 
@@ -140,7 +145,7 @@ const PersonaCard: React.FC<PersonaCardProps> = ({ persona }) => {
             Benefits
           </Typography>
           <Grid container spacing={2}>
-            {persona.benefits.map((benefit, idx) => (
+            {persona.benefits.map((benefit: string, idx: number) => (
               <Grid item xs={12} key={idx}>
                 <Box
                   sx={{
@@ -190,7 +195,7 @@ const PersonaCard: React.FC<PersonaCardProps> = ({ persona }) => {
             Expected Outcomes
           </Typography>
           <Grid container spacing={2}>
-            {persona.outcomes.map((outcome, idx) => (
+            {persona.outcomes.map((outcome: string, idx: number) => (
               <Grid item xs={12} key={idx}>
                 <Box
                   sx={{
@@ -229,7 +234,7 @@ const PersonaCard: React.FC<PersonaCardProps> = ({ persona }) => {
         </Box>
 
         <Box sx={{ display: 'flex', gap: 2 }}>
-          {persona.agents.map((agent) => {
+          {persona.agents.map((agent: string) => {
             const Icon = AgentIconMap[agent as keyof typeof AgentIconMap];
             return (
               <Box
@@ -389,7 +394,7 @@ const Personas: React.FC = () => {
           position: 'relative', 
           zIndex: 1,
           width: '100%',
-          px: { xs: 2, sm: 4, md: 6 },
+          px: { xs: 1, sm: 2, md: 3 },
           pt: '120px',
           pb: '80px',
           display: 'flex',
@@ -397,7 +402,7 @@ const Personas: React.FC = () => {
           alignItems: 'center',
         }}
       >
-        <Box sx={{ width: '100%', maxWidth: '1600px' }}>
+        <Box sx={{ width: '98%' }}>
           <Box sx={{ textAlign: 'center', mb: 8 }}>
             <GradientText variant="h2" sx={{ mb: 3, fontWeight: 700, fontSize: '4rem' }}>
               Who We Serve

@@ -1,178 +1,130 @@
 import React from 'react';
-import { Box, Typography } from '@mui/material';
-import { Step } from '../types';
+import { Box, Container, Typography, Grid } from '@mui/material';
+import {
+  Memory as IdeationIcon,
+  Architecture as PlanningIcon,
+  Palette as DesignIcon,
+  Code as DevelopmentIcon,
+  BugReport as TestingIcon,
+  Rocket as LaunchIcon,
+} from '@mui/icons-material';
 
-interface TimelineSectionProps {
-  steps: Step[];
+interface TimelineStep {
+  icon: React.ReactElement;
+  title: string;
+  description: string;
 }
 
-const TimelineSection: React.FC<TimelineSectionProps> = ({ steps }) => {
+const steps: TimelineStep[] = [
+  {
+    icon: <IdeationIcon sx={{ fontSize: 40, color: '#00A3FF' }} />,
+    title: 'Ideation',
+    description: 'Transform your vision into actionable concepts with AI assistance.',
+  },
+  {
+    icon: <PlanningIcon sx={{ fontSize: 40, color: '#00A3FF' }} />,
+    title: 'Planning',
+    description: 'Structure your development roadmap with data-driven insights.',
+  },
+  {
+    icon: <DesignIcon sx={{ fontSize: 40, color: '#00A3FF' }} />,
+    title: 'Design',
+    description: 'Create intuitive user experiences with AI-powered design tools.',
+  },
+  {
+    icon: <DevelopmentIcon sx={{ fontSize: 40, color: '#00A3FF' }} />,
+    title: 'Development',
+    description: 'Build your product efficiently with automated workflows.',
+  },
+  {
+    icon: <TestingIcon sx={{ fontSize: 40, color: '#00A3FF' }} />,
+    title: 'Testing',
+    description: 'Ensure quality with comprehensive automated testing.',
+  },
+  {
+    icon: <LaunchIcon sx={{ fontSize: 40, color: '#00A3FF' }} />,
+    title: 'Launch',
+    description: 'Deploy confidently with streamlined release management.',
+  },
+];
+
+const TimelineSection: React.FC = () => {
   return (
-    <Box 
-      sx={{ 
-        py: { xs: 12, md: 16 },
-        width: '100%',
-        display: 'flex',
-        justifyContent: 'center',
-        px: { xs: 2, sm: 4, md: 6 },
-        position: 'relative',
-        bgcolor: 'transparent',
-      }}
-    >
-      <Box sx={{ width: '100%', maxWidth: '1600px', position: 'relative', zIndex: 1 }}>
+    <Box sx={{ py: 10 }}>
+      <Container maxWidth="lg">
         <Typography
-          variant="h2"
+          variant="h3"
+          align="center"
           sx={{
-            fontSize: { xs: '2rem', md: '3rem' },
-            fontWeight: 700,
-            color: '#00A3FF',
-            textAlign: 'center',
-            mb: 3,
-            textShadow: '0 0 20px rgba(0, 163, 255, 0.3)',
-            pointerEvents: 'none',
+            color: 'white',
+            fontWeight: 600,
+            mb: 2,
           }}
         >
-          How It Works: A Guided Path from Concept to Completion
+          Development Process
         </Typography>
         <Typography
+          variant="h6"
+          align="center"
           sx={{
             color: 'rgba(255, 255, 255, 0.7)',
-            textAlign: 'center',
-            mb: 12,
-            maxWidth: '800px',
+            mb: 8,
+            maxWidth: 800,
             mx: 'auto',
-            fontSize: '1.1rem',
-            lineHeight: 1.7,
-            pointerEvents: 'none',
           }}
         >
-          Building something extraordinary doesn't have to be complicated. We've designed a step-by-step journey where your idea evolves effortlessly through AI-driven insights, user feedback loops, and intelligent orchestration.
+          Our streamlined process guides you from concept to launch with AI assistance at every step
         </Typography>
-
-        <Box sx={{ position: 'relative' }}>
-          {/* Timeline line */}
-          <Box
-            sx={{
-              position: 'absolute',
-              left: { xs: 20, md: '50%' },
-              top: 0,
-              bottom: 0,
-              width: 2,
-              background: 'linear-gradient(180deg, rgba(0, 163, 255, 0.3) 0%, rgba(0, 163, 255, 0.1) 100%)',
-              transform: { xs: 'none', md: 'translateX(-50%)' },
-              pointerEvents: 'none',
-            }}
-          />
-
-          {/* Steps */}
+        <Grid container spacing={4}>
           {steps.map((step, index) => (
-            <Box
-              key={index}
-              sx={{
-                position: 'relative',
-                mb: 8,
-                ml: { xs: 8, md: 0 },
-                '&:last-child': { mb: 0 },
-              }}
-            >
-              {/* Timeline dot */}
+            <Grid item xs={12} sm={6} md={4} key={index}>
               <Box
                 sx={{
-                  position: 'absolute',
-                  left: { xs: -28, md: '50%' },
-                  top: 24,
-                  width: 20,
-                  height: 20,
-                  borderRadius: '50%',
-                  bgcolor: '#00A3FF',
-                  transform: { xs: 'none', md: 'translateX(-50%)' },
-                  zIndex: 1,
-                  boxShadow: '0 0 20px rgba(0, 163, 255, 0.5)',
-                  border: '3px solid transparent',
-                  pointerEvents: 'none',
-                }}
-              />
-
-              {/* Content */}
-              <Box
-                sx={{
-                  ml: { xs: 0, md: index % 2 === 0 ? 0 : '50%' },
-                  mr: { xs: 0, md: index % 2 === 0 ? '50%' : 0 },
-                  pl: { xs: 0, md: index % 2 === 0 ? 0 : 8 },
-                  pr: { xs: 0, md: index % 2 === 0 ? 8 : 0 },
-                  textAlign: { xs: 'left', md: index % 2 === 0 ? 'right' : 'left' },
+                  position: 'relative',
+                  p: 3,
+                  height: '100%',
+                  bgcolor: 'rgba(255, 255, 255, 0.05)',
+                  borderRadius: 2,
+                  transition: 'all 0.3s',
+                  '&:hover': {
+                    transform: 'translateY(-4px)',
+                    bgcolor: 'rgba(255, 255, 255, 0.08)',
+                  },
+                  '&::before': {
+                    content: '""',
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    width: '100%',
+                    height: '2px',
+                    background: 'linear-gradient(90deg, #00A3FF 0%, rgba(0, 163, 255, 0) 100%)',
+                  },
                 }}
               >
-                <Box
+                <Box sx={{ mb: 2 }}>{step.icon}</Box>
+                <Typography
+                  variant="h6"
                   sx={{
-                    bgcolor: 'rgba(2, 9, 20, 0.4)',
-                    backdropFilter: 'blur(10px)',
-                    p: 4,
-                    borderRadius: 3,
-                    border: '1px solid rgba(255, 255, 255, 0.05)',
-                    transition: 'all 0.3s ease-in-out',
-                    pointerEvents: 'none',
-                    '&:hover': {
-                      borderColor: 'rgba(0, 163, 255, 0.3)',
-                      boxShadow: '0 4px 20px rgba(0, 163, 255, 0.1)',
-                      transform: 'translateY(-4px)',
-                      bgcolor: 'rgba(2, 9, 20, 0.5)',
-                    },
+                    color: 'white',
+                    fontWeight: 600,
+                    mb: 1,
                   }}
                 >
-                  <Typography
-                    sx={{
-                      color: '#00A3FF',
-                      fontWeight: 600,
-                      fontSize: '1.25rem',
-                      opacity: 0.8,
-                      mb: 2,
-                    }}
-                  >
-                    {step.number}
-                  </Typography>
-                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 2, justifyContent: { xs: 'flex-start', md: index % 2 === 0 ? 'flex-end' : 'flex-start' } }}>
-                    <Box
-                      sx={{
-                        order: { xs: 0, md: index % 2 === 0 ? 1 : 0 },
-                        ml: { xs: 0, md: index % 2 === 0 ? 2 : 0 },
-                        mr: { xs: 2, md: index % 2 === 0 ? 0 : 2 },
-                        bgcolor: 'rgba(0, 163, 255, 0.1)',
-                        borderRadius: 1,
-                        p: 1,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                      }}
-                    >
-                      {step.icon}
-                    </Box>
-                    <Typography
-                      variant="h6"
-                      sx={{
-                        fontWeight: 600,
-                        color: 'white',
-                        fontSize: '1.1rem',
-                      }}
-                    >
-                      {step.title}
-                    </Typography>
-                  </Box>
-                  <Typography
-                    sx={{
-                      color: 'rgba(255, 255, 255, 0.7)',
-                      fontSize: '0.95rem',
-                      lineHeight: 1.7,
-                    }}
-                  >
-                    {step.description}
-                  </Typography>
-                </Box>
+                  {step.title}
+                </Typography>
+                <Typography
+                  sx={{
+                    color: 'rgba(255, 255, 255, 0.7)',
+                    fontSize: '0.875rem',
+                  }}
+                >
+                  {step.description}
+                </Typography>
               </Box>
-            </Box>
+            </Grid>
           ))}
-        </Box>
-      </Box>
+        </Grid>
+      </Container>
     </Box>
   );
 };

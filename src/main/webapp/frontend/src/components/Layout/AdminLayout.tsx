@@ -1,51 +1,49 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
 import { Box } from '@mui/material';
-import Sidebar from '../admin/Sidebar';
-import ParticleBackground from '../shared/ParticleBackground';
+import {
+  Dashboard as DashboardIcon,
+  People as UsersIcon,
+  Business as CompaniesIcon,
+  Settings as SettingsIcon,
+  Security as SecurityIcon,
+} from '@mui/icons-material';
+import Header from '../shared/Header';
 
-const AdminLayout = () => {
+const navItems = [
+  {
+    label: 'Dashboard',
+    icon: <DashboardIcon />,
+    path: '/admin/dashboard',
+  },
+  {
+    label: 'Users',
+    icon: <UsersIcon />,
+    path: '/admin/users',
+  },
+  {
+    label: 'Companies',
+    icon: <CompaniesIcon />,
+    path: '/admin/companies',
+  },
+  {
+    label: 'Settings',
+    icon: <SettingsIcon />,
+    path: '/admin/settings',
+  },
+  {
+    label: 'Security Audit',
+    icon: <SecurityIcon />,
+    path: '/admin/security-audit',
+  },
+];
+
+const AdminLayout: React.FC = () => {
   return (
-    <Box 
-      component="div"
-      sx={{ 
-        display: 'flex', 
-        minHeight: '100vh', 
-        bgcolor: '#070E1A' 
-      }}
-    >
-      <Sidebar />
-      <Box 
-        component="div" 
-        sx={{ 
-          flexGrow: 1,
-          minHeight: '100vh',
-          position: 'relative',
-          pt: 4,
-        }}
-      >
-        <ParticleBackground />
-        <Box 
-          component="div" 
-          sx={{ 
-            position: 'relative', 
-            zIndex: 1,
-            display: 'flex',
-            flexDirection: 'column',
-            minHeight: '100%',
-          }}
-        >
-          <Box 
-            component="div" 
-            sx={{ 
-              flexGrow: 1,
-              display: 'flex',
-              flexDirection: 'column',
-            }}
-          >
-            <Outlet />
-          </Box>
-        </Box>
+    <Box sx={{ minHeight: '100vh', bgcolor: '#0A1929' }}>
+      <Header navItems={navItems} />
+      <Box component="main" sx={{ p: 3 }}>
+        <Outlet />
       </Box>
     </Box>
   );

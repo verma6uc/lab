@@ -1,22 +1,20 @@
 import React from 'react';
 import { RouteObject } from 'react-router-dom';
-import CreatorLayout from '../components/Layout/CreatorLayout';
+import PublicLayout from '../components/Layout/PublicLayout';
 import Home from '../pages/Home';
 import Features from '../pages/Features';
 import Solutions from '../pages/Solutions';
 import Personas from '../pages/Personas';
 import Agents from '../pages/Agents';
 import Journey from '../pages/Journey';
-import Teams from '../pages/Teams';
-import Conversations from '../pages/Conversations';
 
-const creatorRoutes: RouteObject[] = [
+const publicRoutes: RouteObject[] = [
   {
     path: '/',
-    element: <CreatorLayout />,
+    element: <PublicLayout />,
     children: [
       {
-        path: '',
+        index: true,
         element: <Home />,
       },
       {
@@ -39,16 +37,8 @@ const creatorRoutes: RouteObject[] = [
         path: 'journey',
         element: <Journey />,
       },
-      {
-        path: 'teams',
-        element: <Teams />,
-      },
-      {
-        path: 'conversations',
-        element: <Conversations />,
-      },
     ],
   },
 ];
 
-export default creatorRoutes;
+export default publicRoutes;

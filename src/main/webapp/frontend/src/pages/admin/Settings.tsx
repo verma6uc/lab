@@ -1,477 +1,144 @@
 import React, { useState } from 'react';
-import {
-  Box,
-  Card,
-  CardContent,
+import { 
+  Box, 
+  Typography, 
   Grid,
-  Typography,
-  Switch,
-  FormControlLabel,
-  TextField,
-  Button,
-  Tabs,
-  Tab,
-  Divider,
-  Stack,
-  Alert,
-  IconButton,
-  Tooltip,
-  Select,
-  MenuItem,
-  InputLabel,
-  FormControl,
+  Paper,
 } from '@mui/material';
-import {
-  Settings as SettingsIcon,
-  Save,
-  Refresh,
-  Security,
-  Notifications,
-  Storage,
-  Email,
-  CloudSync,
-  Help,
-  InfoOutlined,
-} from '@mui/icons-material';
-import PageContainer from '../../components/admin/PageContainer';
+import PageContainer from '../../components/shared/PageContainer';
+import StyledTextField from '../../components/shared/StyledTextField';
+import StyledSwitch from '../../components/shared/StyledSwitch';
+import StyledButton from '../../components/shared/StyledButton';
 
-interface TabPanelProps {
-  children?: React.ReactNode;
-  index: number;
-  value: number;
-}
-
-const TabPanel = (props: TabPanelProps) => {
-  const { children, value, index, ...other } = props;
-  return (
-    <Box
-      role="tabpanel"
-      hidden={value !== index}
-      id={`settings-tabpanel-${index}`}
-      {...other}
-      sx={{ py: 3 }}
-    >
-      {value === index && children}
-    </Box>
-  );
-};
-
-const SettingSection = ({ title, description, children }: {
-  title: string;
-  description: string;
-  children: React.ReactNode;
-}) => (
-  <Card sx={{ mb: 3 }}>
-    <CardContent>
-      <Box sx={{ mb: 3 }}>
-        <Typography variant="h6" gutterBottom>
-          {title}
-        </Typography>
-        <Typography variant="body2" color="text.secondary">
-          {description}
-        </Typography>
-      </Box>
-      <Divider sx={{ mb: 3 }} />
-      {children}
-    </CardContent>
-  </Card>
-);
-
-const Settings = () => {
-  const [tabValue, setTabValue] = useState(0);
-  const [hasChanges, setHasChanges] = useState(false);
-  const [settings, setSettings] = useState({
-    // Security Settings
-    twoFactorAuth: true,
-    passwordPolicy: 'strong',
-    sessionTimeout: 30,
-    ipWhitelist: '',
-    
-    // Notification Settings
-    emailNotifications: true,
-    slackIntegration: false,
-    notificationFrequency: 'realtime',
-    
-    // Backup Settings
-    autoBackup: true,
-    backupFrequency: 'daily',
-    retentionPeriod: 30,
-    
-    // Email Settings
-    smtpServer: 'smtp.example.com',
-    smtpPort: 587,
-    smtpUsername: '',
-    smtpPassword: '',
-    senderEmail: 'noreply@example.com',
-    
-    // Integration Settings
-    apiKey: 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx',
-    webhookUrl: '',
-    allowedOrigins: '*',
-  });
-
-  const handleChange = (section: string, field: string, value: any) => {
-    setSettings(prev => ({
-      ...prev,
-      [field]: value
-    }));
-    setHasChanges(true);
-  };
+const Settings: React.FC = () => {
+  const [systemName, setSystemName] = useState('Yuvi Admin');
+  const [supportEmail, setSupportEmail] = useState('support@yuvi.ai');
+  const [notifications, setNotifications] = useState(true);
+  const [twoFactor, setTwoFactor] = useState(true);
+  const [sessionTimeout, setSessionTimeout] = useState(true);
+  const [apiKey, setApiKey] = useState('sk-****************************************');
+  const [rateLimiting, setRateLimiting] = useState(true);
 
   const handleSave = () => {
-    console.log('Saving settings:', settings);
-    setHasChanges(false);
+    // Handle save logic
   };
 
-  const handleReset = () => {
-    // Reset to default values
-    console.log('Resetting settings');
-  };
+  const SettingsSection = ({ title, children }: { title: string, children: React.ReactNode }) => (
+    <Paper sx={{ 
+      p: 3,
+      mb: 3,
+      bgcolor: 'rgba(10, 25, 41, 0.7)',
+      borderRadius: 2,
+      border: '1px solid rgba(0, 163, 255, 0.1)',
+      backdropFilter: 'blur(10px)',
+      transition: 'all 0.3s ease',
+      '&:hover': {
+        border: '1px solid rgba(0, 163, 255, 0.2)',
+        boxShadow: '0 8px 32px rgba(0, 163, 255, 0.1)',
+      }
+    }}>
+      <Typography variant="h6" sx={{ color: 'white', mb: 3, fontWeight: 500 }}>
+        {title}
+      </Typography>
+      {children}
+    </Paper>
+  );
 
   return (
-    <PageContainer
-      icon={<SettingsIcon />}
-      title="System Settings"
-    >
-      <Box sx={{ width: '100%' }}>
-        {hasChanges && (
-          <Alert 
-            severity="warning" 
+    <PageContainer>
+      <Box sx={{ mb: 4 }}>
+        <Typography variant="h4" sx={{ color: 'white', mb: 2, fontWeight: 600 }}>
+          System Settings
+        </Typography>
+        <Typography sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
+          Configure system-wide settings and preferences
+        </Typography>
+      </Box>
+
+      <Box component="form" noValidate autoComplete="off">
+        {/* General Settings */}
+        <SettingsSection title="General Settings">
+          <Grid container spacing={3}>
+            <Grid item xs={12} md={6}>
+              <StyledTextField
+                fullWidth
+                label="System Name"
+                value={systemName}
+                onChange={(e) => setSystemName(e.target.value)}
+              />
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <StyledTextField
+                fullWidth
+                label="Support Email"
+                value={supportEmail}
+                onChange={(e) => setSupportEmail(e.target.value)}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <StyledSwitch
+                label="Enable System Notifications"
+                checked={notifications}
+                onChange={setNotifications}
+              />
+            </Grid>
+          </Grid>
+        </SettingsSection>
+
+        {/* Security Settings */}
+        <SettingsSection title="Security Settings">
+          <Grid container spacing={2}>
+            <Grid item xs={12}>
+              <StyledSwitch
+                label="Two-Factor Authentication"
+                checked={twoFactor}
+                onChange={setTwoFactor}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <StyledSwitch
+                label="Session Timeout (2 hours)"
+                checked={sessionTimeout}
+                onChange={setSessionTimeout}
+              />
+            </Grid>
+          </Grid>
+        </SettingsSection>
+
+        {/* API Settings */}
+        <SettingsSection title="API Configuration">
+          <StyledTextField
+            fullWidth
+            label="API Key"
+            type="password"
+            value={apiKey}
+            onChange={(e) => setApiKey(e.target.value)}
             sx={{ mb: 3 }}
-            action={
-              <Stack direction="row" spacing={1}>
-                <Button 
-                  variant="contained" 
-                  size="small" 
-                  onClick={handleSave}
-                  startIcon={<Save />}
-                >
-                  Save Changes
-                </Button>
-                <Button 
-                  variant="outlined" 
-                  size="small" 
-                  onClick={handleReset}
-                  startIcon={<Refresh />}
-                >
-                  Reset
-                </Button>
-              </Stack>
-            }
-          >
-            You have unsaved changes. Don't forget to save your settings.
-          </Alert>
-        )}
+          />
 
-        <Tabs
-          value={tabValue}
-          onChange={(_, newValue) => setTabValue(newValue)}
-          sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}
-        >
-          <Tab icon={<Security />} label="Security" />
-          <Tab icon={<Notifications />} label="Notifications" />
-          <Tab icon={<Storage />} label="Backup" />
-          <Tab icon={<Email />} label="Email" />
-          <Tab icon={<CloudSync />} label="Integrations" />
-        </Tabs>
+          <StyledSwitch
+            label="Enable API Rate Limiting"
+            checked={rateLimiting}
+            onChange={setRateLimiting}
+          />
+        </SettingsSection>
 
-        <TabPanel value={tabValue} index={0}>
-          <SettingSection
-            title="Security Configuration"
-            description="Configure security-related settings for your application"
+        <Box sx={{ mt: 4, display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
+          <StyledButton
+            buttonType="secondary"
           >
-            <Grid container spacing={3}>
-              <Grid item xs={12}>
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={settings.twoFactorAuth}
-                      onChange={(e) => handleChange('security', 'twoFactorAuth', e.target.checked)}
-                    />
-                  }
-                  label={
-                    <Stack direction="row" spacing={1} alignItems="center">
-                      <Typography>Two-Factor Authentication</Typography>
-                      <Tooltip title="Requires users to provide a second form of verification">
-                        <InfoOutlined sx={{ fontSize: 16, color: 'text.secondary' }} />
-                      </Tooltip>
-                    </Stack>
-                  }
-                />
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <FormControl fullWidth>
-                  <InputLabel>Password Policy</InputLabel>
-                  <Select
-                    value={settings.passwordPolicy}
-                    label="Password Policy"
-                    onChange={(e) => handleChange('security', 'passwordPolicy', e.target.value)}
-                  >
-                    <MenuItem value="basic">Basic (8+ characters)</MenuItem>
-                    <MenuItem value="medium">Medium (8+ chars, numbers)</MenuItem>
-                    <MenuItem value="strong">Strong (8+ chars, numbers, symbols)</MenuItem>
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <TextField
-                  fullWidth
-                  label="Session Timeout (minutes)"
-                  type="number"
-                  value={settings.sessionTimeout}
-                  onChange={(e) => handleChange('security', 'sessionTimeout', e.target.value)}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  label="IP Whitelist"
-                  placeholder="Enter IP addresses separated by commas"
-                  value={settings.ipWhitelist}
-                  onChange={(e) => handleChange('security', 'ipWhitelist', e.target.value)}
-                  helperText="Leave empty to allow all IPs"
-                />
-              </Grid>
-            </Grid>
-          </SettingSection>
-        </TabPanel>
-
-        <TabPanel value={tabValue} index={1}>
-          <SettingSection
-            title="Notification Preferences"
-            description="Configure how and when notifications are sent"
+            Cancel
+          </StyledButton>
+          <StyledButton
+            buttonType="primary"
+            onClick={handleSave}
           >
-            <Grid container spacing={3}>
-              <Grid item xs={12}>
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={settings.emailNotifications}
-                      onChange={(e) => handleChange('notifications', 'emailNotifications', e.target.checked)}
-                    />
-                  }
-                  label="Email Notifications"
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={settings.slackIntegration}
-                      onChange={(e) => handleChange('notifications', 'slackIntegration', e.target.checked)}
-                    />
-                  }
-                  label="Slack Integration"
-                />
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <FormControl fullWidth>
-                  <InputLabel>Notification Frequency</InputLabel>
-                  <Select
-                    value={settings.notificationFrequency}
-                    label="Notification Frequency"
-                    onChange={(e) => handleChange('notifications', 'notificationFrequency', e.target.value)}
-                  >
-                    <MenuItem value="realtime">Real-time</MenuItem>
-                    <MenuItem value="hourly">Hourly Digest</MenuItem>
-                    <MenuItem value="daily">Daily Digest</MenuItem>
-                    <MenuItem value="weekly">Weekly Digest</MenuItem>
-                  </Select>
-                </FormControl>
-              </Grid>
-            </Grid>
-          </SettingSection>
-        </TabPanel>
-
-        <TabPanel value={tabValue} index={2}>
-          <SettingSection
-            title="Backup Configuration"
-            description="Configure automatic backup settings and retention policies"
-          >
-            <Grid container spacing={3}>
-              <Grid item xs={12}>
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={settings.autoBackup}
-                      onChange={(e) => handleChange('backup', 'autoBackup', e.target.checked)}
-                    />
-                  }
-                  label={
-                    <Stack direction="row" spacing={1} alignItems="center">
-                      <Typography>Automatic Backups</Typography>
-                      <Tooltip title="Automatically backup your data at scheduled intervals">
-                        <InfoOutlined sx={{ fontSize: 16, color: 'text.secondary' }} />
-                      </Tooltip>
-                    </Stack>
-                  }
-                />
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <FormControl fullWidth>
-                  <InputLabel>Backup Frequency</InputLabel>
-                  <Select
-                    value={settings.backupFrequency}
-                    label="Backup Frequency"
-                    onChange={(e) => handleChange('backup', 'backupFrequency', e.target.value)}
-                  >
-                    <MenuItem value="hourly">Every Hour</MenuItem>
-                    <MenuItem value="daily">Daily</MenuItem>
-                    <MenuItem value="weekly">Weekly</MenuItem>
-                    <MenuItem value="monthly">Monthly</MenuItem>
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <TextField
-                  fullWidth
-                  type="number"
-                  label="Retention Period (days)"
-                  value={settings.retentionPeriod}
-                  onChange={(e) => handleChange('backup', 'retentionPeriod', e.target.value)}
-                  helperText="Number of days to keep backup files"
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={() => console.log('Manual backup triggered')}
-                >
-                  Create Manual Backup
-                </Button>
-              </Grid>
-            </Grid>
-          </SettingSection>
-        </TabPanel>
-
-        <TabPanel value={tabValue} index={3}>
-          <SettingSection
-            title="Email Configuration"
-            description="Configure SMTP settings for sending emails"
-          >
-            <Grid container spacing={3}>
-              <Grid item xs={12} md={6}>
-                <TextField
-                  fullWidth
-                  label="SMTP Server"
-                  value={settings.smtpServer}
-                  onChange={(e) => handleChange('email', 'smtpServer', e.target.value)}
-                />
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <TextField
-                  fullWidth
-                  type="number"
-                  label="SMTP Port"
-                  value={settings.smtpPort}
-                  onChange={(e) => handleChange('email', 'smtpPort', e.target.value)}
-                />
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <TextField
-                  fullWidth
-                  label="SMTP Username"
-                  value={settings.smtpUsername}
-                  onChange={(e) => handleChange('email', 'smtpUsername', e.target.value)}
-                />
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <TextField
-                  fullWidth
-                  type="password"
-                  label="SMTP Password"
-                  value={settings.smtpPassword}
-                  onChange={(e) => handleChange('email', 'smtpPassword', e.target.value)}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  label="Sender Email"
-                  value={settings.senderEmail}
-                  onChange={(e) => handleChange('email', 'senderEmail', e.target.value)}
-                  helperText="Default 'From' address for system emails"
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <Button
-                  variant="contained"
-                  onClick={() => console.log('Test email configuration')}
-                >
-                  Test Configuration
-                </Button>
-              </Grid>
-            </Grid>
-          </SettingSection>
-        </TabPanel>
-
-        <TabPanel value={tabValue} index={4}>
-          <SettingSection
-            title="API & Integration Settings"
-            description="Configure external integrations and API access"
-          >
-            <Grid container spacing={3}>
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  label="API Key"
-                  value={settings.apiKey}
-                  InputProps={{
-                    readOnly: true,
-                    endAdornment: (
-                      <Button
-                        variant="outlined"
-                        size="small"
-                        onClick={() => console.log('Generate new API key')}
-                      >
-                        Regenerate
-                      </Button>
-                    ),
-                  }}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  label="Webhook URL"
-                  value={settings.webhookUrl}
-                  onChange={(e) => handleChange('integration', 'webhookUrl', e.target.value)}
-                  helperText="URL to receive webhook notifications"
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  label="Allowed Origins (CORS)"
-                  value={settings.allowedOrigins}
-                  onChange={(e) => handleChange('integration', 'allowedOrigins', e.target.value)}
-                  helperText="Comma-separated list of allowed origins, use * for all"
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <FormControl fullWidth>
-                  <InputLabel>Webhook Events</InputLabel>
-                  <Select
-                    multiple
-                    value={settings.webhookEvents || []}
-                    label="Webhook Events"
-                    onChange={(e) => handleChange('integration', 'webhookEvents', e.target.value)}
-                  >
-                    <MenuItem value="company.created">Company Created</MenuItem>
-                    <MenuItem value="company.updated">Company Updated</MenuItem>
-                    <MenuItem value="company.deleted">Company Deleted</MenuItem>
-                    <MenuItem value="user.login">User Login</MenuItem>
-                    <MenuItem value="user.logout">User Logout</MenuItem>
-                  </Select>
-                </FormControl>
-              </Grid>
-            </Grid>
-          </SettingSection>
-        </TabPanel>
+            Save Changes
+          </StyledButton>
+        </Box>
       </Box>
     </PageContainer>
   );
 };
 
-export default Settings; 
+export default Settings;

@@ -29,7 +29,7 @@ const StageCard: React.FC<StageCardProps> = ({ stage, index }) => {
           position: 'relative',
           mb: 15,
           pl: { xs: 3, md: 4 },
-          maxWidth: '800px',
+          maxWidth: '1200px',
           '&::before': {
             content: '""',
             position: 'absolute',

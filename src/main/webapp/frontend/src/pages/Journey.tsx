@@ -43,15 +43,15 @@ const Journey: React.FC = () => {
               position: 'relative',
               zIndex: 1,
               width: '100%', 
-              px: { xs: 2, sm: 4, md: 6 },
+              px: { xs: 1, sm: 2, md: 3 },
               pt: '120px',
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
             }}
           >
-            <Box sx={{ width: '100%', maxWidth: '1600px' }}>
-              <Box sx={{ textAlign: 'center', mb: 12 }}>
+            <Box sx={{ width: '98%' }}>
+              <Box sx={{ textAlign: 'center', mb: 8 }}>
                 <GradientText variant="h2" sx={{ mb: 3, fontWeight: 700, fontSize: '4rem' }}>
                   Service as Software
                 </GradientText>
@@ -59,35 +59,36 @@ const Journey: React.FC = () => {
                   sx={{
                     color: 'rgba(255, 255, 255, 0.8)',
                     fontSize: '1.2rem',
-                    maxWidth: '900px',
                     mx: 'auto',
                     lineHeight: 1.7,
-                    mb: 8,
+                    mb: 6,
                   }}
                 >
                   In a world where traditional 'Software as a Service' offers rigid, pre-defined solutions, our AI-powered platform evolves the paradigm into 'Service as Software'—a dynamic, adaptive approach tailored to your unique challenges.
                 </Typography>
 
-                <Grid container spacing={6} sx={{ maxWidth: '1200px', mx: 'auto' }}>
-                  <Grid item xs={12} md={4}>
-                    <FeatureCard 
-                      title="Why the shift is needed"
-                      description="Traditional SaaS can be rigid and requires businesses to adapt to the software. 'Service as Software' adapts dynamically to your business processes."
-                    />
+                <Box sx={{ width: '100%' }}>
+                  <Grid container spacing={2}>
+                    <Grid item xs={12} md={4}>
+                      <FeatureCard 
+                        title="Why the shift is needed"
+                        description="Traditional SaaS can be rigid and requires businesses to adapt to the software. 'Service as Software' adapts dynamically to your business processes."
+                      />
+                    </Grid>
+                    <Grid item xs={12} md={4}>
+                      <FeatureCard 
+                        title="Benefits Explained"
+                        description="Customization tailors solutions to unique challenges. Real-time optimization learns and improves continuously. Efficiency reduces friction and simplifies workflows, accelerating innovation and measurable outcomes."
+                      />
+                    </Grid>
+                    <Grid item xs={12} md={4}>
+                      <FeatureCard 
+                        title="The Vision"
+                        description="Software is no longer a tool but an intelligent ecosystem that grows with your business, uniting cutting-edge AI with your vision to transform processes into intelligent, service-driven ecosystems."
+                      />
+                    </Grid>
                   </Grid>
-                  <Grid item xs={12} md={4}>
-                    <FeatureCard 
-                      title="Benefits Explained"
-                      description="Customization tailors solutions to unique challenges. Real-time optimization learns and improves continuously. Efficiency reduces friction and simplifies workflows, accelerating innovation and measurable outcomes."
-                    />
-                  </Grid>
-                  <Grid item xs={12} md={4}>
-                    <FeatureCard 
-                      title="The Vision"
-                      description="Software is no longer a tool but an intelligent ecosystem that grows with your business, uniting cutting-edge AI with your vision to transform processes into intelligent, service-driven ecosystems."
-                    />
-                  </Grid>
-                </Grid>
+                </Box>
               </Box>
             </Box>
           </Box>
@@ -100,19 +101,18 @@ const Journey: React.FC = () => {
               position: 'relative',
               zIndex: 1,
               width: '100%', 
-              px: { xs: 2, sm: 4, md: 6 },
+              px: { xs: 1, sm: 2, md: 3 },
               pb: '80px',
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
             }}
           >
-            <Box sx={{ width: '100%', maxWidth: '1600px' }}>
+            <Box sx={{ width: '98%' }}>
               {/* Divider */}
               <Box 
                 sx={{ 
                   width: '100%', 
-                  maxWidth: '800px', 
                   mx: 'auto',
                   mb: 12,
                   position: 'relative',
@@ -141,7 +141,6 @@ const Journey: React.FC = () => {
                   sx={{
                     color: 'rgba(255, 255, 255, 0.8)',
                     fontSize: '1.2rem',
-                    maxWidth: '800px',
                     mx: 'auto',
                     lineHeight: 1.7,
                   }}

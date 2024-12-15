@@ -1,90 +1,83 @@
 import React from 'react';
 import { Box, Typography, Button } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
 
 const CallToAction: React.FC = () => {
-  const navigate = useNavigate();
-
   return (
-    <Box 
-      sx={{ 
-        width: '100%', 
-        py: { xs: 12, md: 16 }, 
-        px: { xs: 2, sm: 4, md: 6 },
-        display: 'flex',
-        justifyContent: 'center',
+    <Box
+      sx={{
+        py: { xs: 8, md: 10 },
+        px: { xs: 1, sm: 2, md: 3 },
         position: 'relative',
-        bgcolor: 'rgba(2, 9, 20, 0.4)',
-        backdropFilter: 'blur(10px)',
-        pointerEvents: 'none',
+        '&::before': {
+          content: '""',
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          height: '1px',
+          background: 'linear-gradient(90deg, rgba(0, 163, 255, 0) 0%, #00A3FF 50%, rgba(0, 163, 255, 0) 100%)',
+        },
       }}
     >
-      <Box sx={{ 
-        width: '100%', 
-        maxWidth: '1600px', 
-        textAlign: 'center',
-        position: 'relative',
-        zIndex: 1,
-      }}>
+      <Box
+        sx={{
+          textAlign: 'center',
+          maxWidth: 800,
+          mx: 'auto',
+        }}
+      >
         <Typography
-          variant="h2"
+          variant="h3"
           sx={{
-            fontSize: { xs: '2rem', md: '3rem' },
-            fontWeight: 700,
-            color: '#00A3FF',
-            mb: 3,
-            textShadow: '0 0 20px rgba(0, 163, 255, 0.3)',
+            color: 'white',
+            fontWeight: 600,
+            mb: 2,
           }}
         >
           Ready to Build Something Amazing?
         </Typography>
         <Typography
+          variant="h6"
           sx={{
             color: 'rgba(255, 255, 255, 0.7)',
             mb: 6,
-            maxWidth: '600px',
-            mx: 'auto',
-            fontSize: '1.1rem',
-            lineHeight: 1.7,
+            lineHeight: 1.6,
           }}
         >
           Join us in revolutionizing the way products are built. Experience the power of AI-assisted creation.
         </Typography>
         <Button
-          variant="outlined"
+          variant="contained"
           size="large"
-          onClick={() => navigate('/features')}
           sx={{
-            color: '#00A3FF',
-            borderColor: '#00A3FF',
-            bgcolor: 'rgba(0, 163, 255, 0.05)',
-            pointerEvents: 'auto',
-            '&:hover': {
-              borderColor: '#0081CC',
-              bgcolor: 'rgba(0, 163, 255, 0.1)',
-              transform: 'translateY(-4px)',
-              boxShadow: '0 4px 20px rgba(0, 163, 255, 0.2)',
-            },
+            bgcolor: '#0066FF',
+            color: 'white',
             px: 6,
             py: 2,
-            borderRadius: 2,
-            textTransform: 'none',
             fontSize: '1.1rem',
-            transition: 'all 0.3s ease-in-out',
+            textTransform: 'none',
+            borderRadius: 2,
             position: 'relative',
             overflow: 'hidden',
+            transition: 'all 0.3s ease-in-out',
+            '&:hover': {
+              bgcolor: '#0052CC',
+              transform: 'translateY(-2px)',
+              boxShadow: '0 8px 20px rgba(0, 102, 255, 0.3)',
+            },
             '&::before': {
               content: '""',
               position: 'absolute',
               top: 0,
-              left: '-100%',
-              width: '100%',
-              height: '100%',
-              background: 'linear-gradient(90deg, transparent 0%, rgba(0, 163, 255, 0.1) 50%, transparent 100%)',
-              transition: 'left 0.5s ease-in-out',
+              left: 0,
+              right: 0,
+              bottom: 0,
+              background: 'linear-gradient(45deg, rgba(255,255,255,0.1), rgba(255,255,255,0))',
+              transform: 'translateX(-100%)',
+              transition: 'transform 0.6s',
             },
             '&:hover::before': {
-              left: '100%',
+              transform: 'translateX(100%)',
             },
           }}
         >

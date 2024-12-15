@@ -8,16 +8,19 @@ interface FeatureCardProps {
 
 const FeatureCard: React.FC<FeatureCardProps> = ({ title, description }) => (
   <Box sx={{ 
-    p: 4, 
+    p: 3, 
     background: 'linear-gradient(135deg, rgba(0, 163, 255, 0.1) 0%, rgba(0, 163, 255, 0.05) 100%)',
     borderRadius: '24px',
     border: '1px solid rgba(0, 163, 255, 0.1)',
     height: '100%',
+    width: '100%',
     transition: 'all 0.3s ease',
     position: 'relative',
     overflow: 'hidden',
     boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
     backdropFilter: 'blur(10px)',
+    display: 'flex',
+    flexDirection: 'column',
     '&:hover': {
       transform: 'translateY(-4px)',
       border: '1px solid rgba(0, 163, 255, 0.2)',
@@ -72,6 +75,7 @@ const FeatureCard: React.FC<FeatureCardProps> = ({ title, description }) => (
         color: 'rgba(255, 255, 255, 0.8)', 
         lineHeight: 1.7,
         fontSize: '1.05rem',
+        flex: 1,
       }}
     >
       {description}

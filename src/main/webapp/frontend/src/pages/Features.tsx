@@ -37,7 +37,7 @@ const Features: React.FC = () => {
         sx={{ 
           pt: { xs: 12, md: 16 }, 
           pb: { xs: 8, md: 10 },
-          px: { xs: 2, sm: 4, md: 6 },
+          px: { xs: 1, sm: 2, md: 3 },
           textAlign: 'center',
           animation: `${fadeIn} 0.5s ease-out`,
           position: 'relative',
@@ -92,7 +92,7 @@ const Features: React.FC = () => {
           zIndex: 2,
         }}
       >
-        <Box sx={{ maxWidth: '1600px', mx: 'auto' }}>
+        <Box sx={{ width: '98%', mx: 'auto' }}>
           <Tabs
             value={activeTab}
             onChange={handleTabChange}
@@ -134,9 +134,9 @@ const Features: React.FC = () => {
 
       {/* Content Area */}
       <Box sx={{ 
-        maxWidth: '1600px', 
+        width: '98%', 
         mx: 'auto',
-        px: { xs: 2, sm: 4, md: 6 },
+        px: { xs: 1, sm: 2, md: 3 },
         pb: { xs: 8, md: 12 },
       }}>
         {featureTabs.map((tab, index) => (
