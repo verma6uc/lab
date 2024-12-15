@@ -200,7 +200,7 @@ export interface ApiResponse<T> {
 export interface VectorData {
     id: number;
     vector: number[];
-    metadata?: Record<string, any>;
+    metadata: Record<string, unknown>;
     createdAt: Date;
     updatedAt: Date;
 }
@@ -223,20 +223,20 @@ export type PricingModel = "subscription" | "one-time" | "freemium" | "custom";
 export interface TeamMember {
     id: number;
     name: string;
-    role?: string;
+    role: string;
     bio?: string;
     avatar?: string;
     department?: string;
-    email?: string;
+    email: string;
     linkedin?: string;
     twitter?: string;
     location?: string;
     timezone?: string;
     slackChannel?: string;
     githubTeam?: string;
-    status?: string;
-    createdAt?: Date;
-    updatedAt?: Date;
+    status: string;
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 export interface ResearchItem {
@@ -268,10 +268,11 @@ export interface CompanyUser {
     id: number;
     name: string;
     email: string;
-    role?: string;
+    role: UserRole;
     department?: string;
-    status?: string;
-    // Add other fields as necessary
+    status: UserStatus;
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 export interface CompanyDetails {
