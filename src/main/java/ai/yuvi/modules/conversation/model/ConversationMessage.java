@@ -6,6 +6,7 @@ import ai.yuvi.modules.conversation.enums.MessageType;
 
 public class ConversationMessage {
     private Long id;
+    private Long messageId;
     private Long conversationId;
     private MessageType type;
     private String content;
@@ -23,6 +24,13 @@ public class ConversationMessage {
     }
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Long getMessageId() {
+        return messageId;
+    }
+    public void setMessageId(Long messageId) {
+        this.messageId = messageId;
     }
 
     public Long getConversationId() {

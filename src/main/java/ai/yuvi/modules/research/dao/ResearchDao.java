@@ -14,6 +14,7 @@ import java.util.logging.Logger;
 
 import javax.sql.DataSource;
 
+import ai.yuvi.modules.research.enums.ResearchStatus;
 import ai.yuvi.modules.research.model.Research;
 
 public class ResearchDao {
@@ -61,11 +62,11 @@ public class ResearchDao {
     public boolean create(Research research) {
         String sql = """
             INSERT INTO research (
-                company_id, title, category, description, methodology, findings,
-                recommendations, conducted_by, participant_count, budget, currency,
-                document_url, presentation_url, start_date, end_date,
-                created_at, updated_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+                company_id, title, category, description, methodology,
+                findings, recommendations, conducted_by, participant_count,
+                budget, currency, document_url, presentation_url, status,
+                start_date, end_date, created_at, updated_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?::research_status, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
         """;
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -83,6 +84,7 @@ public class ResearchDao {
             ps.setString(paramIndex++, research.getCurrency());
             ps.setString(paramIndex++, research.getDocumentUrl());
             ps.setString(paramIndex++, research.getPresentationUrl());
+            ps.setString(paramIndex++, research.getStatus().name());
             
             if (research.getStartDate() != null) {
                 ps.setTimestamp(paramIndex++, Timestamp.from(research.getStartDate().toInstant()));
@@ -117,8 +119,8 @@ public class ResearchDao {
                 title = ?, category = ?, description = ?, methodology = ?,
                 findings = ?, recommendations = ?, conducted_by = ?,
                 participant_count = ?, budget = ?, currency = ?,
-                document_url = ?, presentation_url = ?, start_date = ?,
-                end_date = ?, updated_at = CURRENT_TIMESTAMP
+                document_url = ?, presentation_url = ?, status = ?::research_status,
+                start_date = ?, end_date = ?, updated_at = CURRENT_TIMESTAMP
             WHERE id = ?
         """;
         try (Connection conn = dataSource.getConnection();
@@ -136,6 +138,7 @@ public class ResearchDao {
             ps.setString(paramIndex++, research.getCurrency());
             ps.setString(paramIndex++, research.getDocumentUrl());
             ps.setString(paramIndex++, research.getPresentationUrl());
+            ps.setString(paramIndex++, research.getStatus().name());
             
             if (research.getStartDate() != null) {
                 ps.setTimestamp(paramIndex++, Timestamp.from(research.getStartDate().toInstant()));
@@ -186,6 +189,7 @@ public class ResearchDao {
         research.setCurrency(rs.getString("currency"));
         research.setDocumentUrl(rs.getString("document_url"));
         research.setPresentationUrl(rs.getString("presentation_url"));
+        research.setStatus(ResearchStatus.valueOf(rs.getString("status")));
         
         Timestamp startDate = rs.getTimestamp("start_date");
         if (startDate != null) {

@@ -2,12 +2,14 @@ package ai.yuvi.modules.research.model;
 
 import java.time.ZonedDateTime;
 
+import ai.yuvi.modules.research.enums.CompetitorStatus;
+
 public class Competitor {
     private Long id;
     private Long companyId;
     private String name;
     private String type;
-    private String status;
+    private CompetitorStatus status;
     private String description;
     private String strengthsWeaknesses;
     private String marketShare;
@@ -55,10 +57,10 @@ public class Competitor {
         this.type = type;
     }
 
-    public String getStatus() {
+    public CompetitorStatus getStatus() {
         return status;
     }
-    public void setStatus(String status) {
+    public void setStatus(CompetitorStatus status) {
         this.status = status;
     }
 

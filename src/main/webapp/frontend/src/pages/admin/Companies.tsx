@@ -4,21 +4,34 @@ import {
   Typography,
   Grid,
   CircularProgress,
+  Alert,
 } from '@mui/material';
 import CompanyCard from '../../components/company/CompanyCard';
 import CompanyDrawer from '../../components/company/CompanyDrawer';
-import DashboardCard from '../../components/company/DashboardCard';
-import { Company } from '../../types/models';
+import { Company, Industry } from '../../types/models';
 import { companyService } from '../../services/company';
-import ParticleBackground from '../../components/shared/ParticleBackground';
 import { Business } from '@mui/icons-material';
 import PageContainer from '../../components/admin/PageContainer';
 
+// Helper function to format industry names
+const formatIndustryName = (industry: string): string => {
+  if (industry === 'ALL') return 'All Industries';
+  
+  // Convert SNAKE_CASE to Title Case
+  return industry
+    .split('_')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ');
+};
+
 const Companies = () => {
   const [companies, setCompanies] = useState<Company[]>([]);
+  const [filteredCompanies, setFilteredCompanies] = useState<Company[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [selectedCompany, setSelectedCompany] = useState<Company | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [selectedIndustry, setSelectedIndustry] = useState<Industry | 'ALL'>('ALL');
 
   useEffect(() => {
     fetchCompanies();
@@ -27,10 +40,21 @@ const Companies = () => {
   const fetchCompanies = async () => {
     try {
       setLoading(true);
-      const data = await companyService.getAll();
-      setCompanies(data);
+      setError(null);
+      const response = await companyService.getAll();
+      if (Array.isArray(response)) {
+        setCompanies(response);
+        setFilteredCompanies(response);
+      } else {
+        setCompanies([]);
+        setFilteredCompanies([]);
+        setError('Invalid data format received from server');
+      }
     } catch (error) {
       console.error('Error fetching companies:', error);
+      setError('Failed to fetch companies. Please try again later.');
+      setCompanies([]);
+      setFilteredCompanies([]);
     } finally {
       setLoading(false);
     }
@@ -55,12 +79,32 @@ const Companies = () => {
   };
 
   const handleSearch = (value: string) => {
-    console.log('Search:', value);
+    const searchTerm = value.toLowerCase();
+    const filtered = companies.filter(company => 
+      company.name.toLowerCase().includes(searchTerm) ||
+      company.description?.toLowerCase().includes(searchTerm) ||
+      company.industry.toLowerCase().includes(searchTerm)
+    );
+    setFilteredCompanies(filtered);
   };
 
-  const handleFilter = () => {
-    console.log('Filter clicked');
+  const handleFilter = (value: string) => {
+    const industry = value as Industry | 'ALL';
+    setSelectedIndustry(industry);
+    
+    if (industry === 'ALL') {
+      setFilteredCompanies(companies);
+    } else {
+      const filtered = companies.filter(company => company.industry === industry);
+      setFilteredCompanies(filtered);
+    }
   };
+
+  // Create filter options from Industry enum with formatted names
+  const filterOptions = ['ALL', ...Object.values(Industry)].map(industry => ({
+    value: industry,
+    label: formatIndustryName(industry)
+  }));
 
   return (
     <PageContainer
@@ -70,22 +114,21 @@ const Companies = () => {
       onFilter={handleFilter}
       onAdd={handleAddClick}
       addButtonLabel="Add Company"
-      filterOptions={[
-        'All Industries',
-        'Technology',
-        'Healthcare',
-        'Finance',
-      ]}
+      filterOptions={filterOptions}
       searchPlaceholder="Search companies..."
     >
       {loading ? (
         <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
           <CircularProgress sx={{ color: 'primary.main' }} />
         </Box>
+      ) : error ? (
+        <Alert severity="error" sx={{ mb: 3 }}>{error}</Alert>
+      ) : filteredCompanies.length === 0 ? (
+        <Alert severity="info" sx={{ mb: 3 }}>No companies found.</Alert>
       ) : (
         <Grid container spacing={3}>
-          {companies.map((company) => (
-            <Grid item xs={12} sm={6} md={4} key={company.companyId}>
+          {filteredCompanies.map((company) => (
+            <Grid item xs={12} sm={6} md={4} key={company.id}>
               <CompanyCard
                 company={company}
                 onEdit={handleEditClick}

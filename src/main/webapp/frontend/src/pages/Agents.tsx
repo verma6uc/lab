@@ -1,321 +1,16 @@
 import React from 'react';
-import { Box, Typography, Grid, Container } from '@mui/material';
+import { Box, Typography, Grid } from '@mui/material';
 import { GradientText } from '../components/shared/StyledComponents';
 import { AgentIconMap } from '../components/shared/AgentIcons';
+import ParticleBackground from '../components/ParticleBackground';
+import { Agent } from './Agents/types';
+import { agentsList } from './Agents/data';
 
-interface Contribution {
-  category: string;
-  items: string[];
+interface AgentCardProps {
+  agent: Agent;
 }
 
-interface Agent {
-  name: string;
-  role: string;
-  description: string;
-  tagline: string;
-  color: string;
-  contributions: Contribution[];
-}
-
-const agentsList: Agent[] = [
-  {
-    name: 'Seldon',
-    role: 'Strategic Planner',
-    description: 'Inspired by Hari Seldon\'s predictive genius, Seldon sets the course. Over time, he\'ll map out milestones, ensure coherence, and help you navigate each critical decision point on your product journey.',
-    tagline: 'A well-crafted path keeps every goal within reach...',
-    color: '#00A3FF',
-    contributions: [
-      {
-        category: 'Planning',
-        items: [
-          'Conducts product roadmap',
-          'Identifies key milestones',
-          'Analyzes market trends'
-        ]
-      },
-      {
-        category: 'Design',
-        items: [
-          'Ensures design decisions align with strategic goals and user needs'
-        ]
-      },
-      {
-        category: 'Launch',
-        items: [
-          'Coordinates launch strategy and timing for maximum impact'
-        ]
-      },
-      {
-        category: 'Evolution',
-        items: [
-          'Plans future iterations based on market response and emerging opportunities'
-        ]
-      }
-    ]
-  },
-  {
-    name: 'Baley',
-    role: 'Research & Insights',
-    description: 'Echoing Elijah Baley\'s investigative prowess, Baley probes markets, competitors, and user needs. As he matures, he\'ll distill vast information into actionable insights, helping you make informed, data-driven choices.',
-    tagline: 'Knowledge transforms uncertainty into opportunity...',
-    color: '#7C3AED',
-    contributions: [
-      {
-        category: 'Planning',
-        items: [
-          'Conducts market research',
-          'Competitor analysis',
-          'User need assessment'
-        ]
-      },
-      {
-        category: 'Development',
-        items: [
-          'Provides ongoing user feedback and behavior analysis'
-        ]
-      },
-      {
-        category: 'Testing',
-        items: [
-          'Analyzes user testing results and identifies improvement areas'
-        ]
-      },
-      {
-        category: 'Evolution',
-        items: [
-          'Monitors market trends and user satisfaction for continuous improvement'
-        ]
-      }
-    ]
-  },
-  {
-    name: 'Fastolfe',
-    role: 'Innovation Strategist',
-    description: 'Drawing from Dr. Han Fastolfe\'s pioneering spirit, this agent drives innovation strategy. They identify emerging technologies and opportunities, ensuring your product stays ahead of the curve.',
-    tagline: 'Innovation is the bridge between present and future...',
-    color: '#F97316',
-    contributions: [
-      {
-        category: 'Strategy',
-        items: [
-          'Identifies emerging technology trends',
-          'Develops innovation roadmaps',
-          'Evaluates technological feasibility'
-        ]
-      },
-      {
-        category: 'Research',
-        items: [
-          'Analyzes emerging market opportunities',
-          'Assesses competitive technology landscape'
-        ]
-      },
-      {
-        category: 'Development',
-        items: [
-          'Guides implementation of innovative features',
-          'Ensures technological competitive advantage'
-        ]
-      }
-    ]
-  },
-  {
-    name: 'Dors',
-    role: 'Frontend Experience',
-    description: 'Like Dors Venabili\'s gentle guidance, Dors shapes friendly, intuitive user interfaces. Naturally, she\'ll craft clean layouts, fluid navigation, and a user experience that feels both natural and engaging.',
-    tagline: 'A well-designed interface invites exploration...',
-    color: '#F59E0B',
-    contributions: [
-      {
-        category: 'Design',
-        items: [
-          'Creates intuitive UI/UX designs and interactive prototypes'
-        ]
-      },
-      {
-        category: 'Development',
-        items: [
-          'Implements responsive and accessible frontend components'
-        ]
-      },
-      {
-        category: 'Testing',
-        items: [
-          'Conducts usability testing and interface refinements'
-        ]
-      },
-      {
-        category: 'Evolution',
-        items: [
-          'Updates UI based on user feedback and modern design trends'
-        ]
-      }
-    ]
-  },
-  {
-    name: 'Daneel',
-    role: 'Backend & Data Logic',
-    description: 'Channeling R. Daneel Olivaw\'s reliability, Daneel will handle data processing and storage. In time, he\'ll ensure your product\'s backend is efficient, stable, and always ready to serve up the right information.',
-    tagline: 'Structure data lays the foundation for clarity...',
-    color: '#10B981',
-    contributions: [
-      {
-        category: 'Design',
-        items: [
-          'Architects database schema and API structure'
-        ]
-      },
-      {
-        category: 'Development',
-        items: [
-          'Implements secure and efficient backend systems'
-        ]
-      },
-      {
-        category: 'Testing',
-        items: [
-          'Performs load testing and optimization'
-        ]
-      },
-      {
-        category: 'Evolution',
-        items: [
-          'Scales infrastructure and improves performance'
-        ]
-      }
-    ]
-  },
-  {
-    name: 'Amadiro',
-    role: 'Systems Architect',
-    description: 'Inspired by Dr. Amadiro\'s complex thinking, this agent designs robust system architectures. They ensure scalability, performance, and maintainability across the entire technology stack.',
-    tagline: 'Architecture is the blueprint of possibilities...',
-    color: '#06B6D4',
-    contributions: [
-      {
-        category: 'Design',
-        items: [
-          'Creates system architecture blueprints',
-          'Designs scalable infrastructure',
-          'Plans technical debt management'
-        ]
-      },
-      {
-        category: 'Development',
-        items: [
-          'Guides architectural implementation',
-          'Ensures system scalability'
-        ]
-      },
-      {
-        category: 'Evolution',
-        items: [
-          'Monitors system performance',
-          'Plans architectural improvements'
-        ]
-      }
-    ]
-  },
-  {
-    name: 'Giskard',
-    role: 'Integration & Cohesion',
-    description: 'Reflecting R. Giskard\'s subtle interplay, Giskard will orchestrate seamless communication between systems. As he evolves, expect effortless integrations, ensuring all parts work together in perfect harmony.',
-    tagline: 'When every piece fits, the whole grows stronger...',
-    color: '#8B5CF6',
-    contributions: [
-      {
-        category: 'Development',
-        items: [
-          'Manages system responses and API connections'
-        ]
-      },
-      {
-        category: 'Testing',
-        items: [
-          'Ensures cross-system compatibility and data flow'
-        ]
-      },
-      {
-        category: 'Launch',
-        items: [
-          'Coordinates deployment of integrated systems'
-        ]
-      },
-      {
-        category: 'Evolution',
-        items: [
-          'Maintains and updates service interconnections'
-        ]
-      }
-    ]
-  },
-  {
-    name: 'Calvin',
-    role: 'Quality & Evolution',
-    description: 'Inspired by Susan Calvin\'s deep understanding of robotic minds, Calvin will focus on testing, refining, and iterating. Over time, she\'ll assess feedback, suggest improvements, and ensure your product continuously evolves for the better.',
-    tagline: 'Refinement is the engine of lasting progress...',
-    color: '#EC4899',
-    contributions: [
-      {
-        category: 'Development',
-        items: [
-          'Implements quality assurance processes'
-        ]
-      },
-      {
-        category: 'Testing',
-        items: [
-          'Conducts comprehensive testing and bug tracking'
-        ]
-      },
-      {
-        category: 'Launch',
-        items: [
-          'Ensures product stability and performance'
-        ]
-      },
-      {
-        category: 'Evolution',
-        items: [
-          'Monitors and improves quality control metrics'
-        ]
-      }
-    ]
-  },
-  {
-    name: 'Vasilia',
-    role: 'Performance Optimizer',
-    description: 'Like Vasilia Aliena\'s pursuit of perfection, this agent focuses on optimizing system performance. They fine-tune every aspect of the product to ensure maximum efficiency and user satisfaction.',
-    tagline: 'Performance excellence drives user delight...',
-    color: '#14B8A6',
-    contributions: [
-      {
-        category: 'Analysis',
-        items: [
-          'Conducts performance audits',
-          'Identifies optimization opportunities',
-          'Monitors system metrics'
-        ]
-      },
-      {
-        category: 'Optimization',
-        items: [
-          'Implements performance improvements',
-          'Optimizes resource utilization'
-        ]
-      },
-      {
-        category: 'Monitoring',
-        items: [
-          'Tracks performance metrics',
-          'Provides optimization recommendations'
-        ]
-      }
-    ]
-  }
-];
-
-const AgentCard = ({ agent }: { agent: Agent }) => {
+const AgentCard: React.FC<AgentCardProps> = ({ agent }) => {
   const Icon = AgentIconMap[agent.name as keyof typeof AgentIconMap];
   
   return (
@@ -327,6 +22,7 @@ const AgentCard = ({ agent }: { agent: Agent }) => {
         height: '100%',
         border: '1px solid rgba(255, 255, 255, 0.1)',
         transition: 'all 0.3s ease',
+        backdropFilter: 'blur(10px)',
         '&:hover': {
           transform: 'translateY(-8px)',
           boxShadow: `0 20px 40px rgba(0, 0, 0, 0.4)`,
@@ -455,35 +151,62 @@ const AgentCard = ({ agent }: { agent: Agent }) => {
   );
 };
 
-const Agents = () => {
+const Agents: React.FC = () => {
   return (
-    <Container maxWidth="xl" sx={{ pt: '120px', pb: '80px' }}>
-      <Box sx={{ textAlign: 'center', mb: 8 }}>
-        <GradientText variant="h2" sx={{ mb: 3, fontWeight: 700 }}>
-          Meet Your AI Team
-        </GradientText>
-        <Typography
-          sx={{
-            color: 'rgba(255, 255, 255, 0.7)',
-            fontSize: '1.1rem',
-            maxWidth: '800px',
-            mx: 'auto'
-          }}
-        >
-          Each agent brings unique capabilities to your project, working in harmony
-          to transform your vision into reality.
-        </Typography>
+    <Box sx={{ 
+      minHeight: '100vh',
+      position: 'relative',
+      overflow: 'hidden',
+      bgcolor: 'transparent',
+    }}>
+      {/* Particle Background Layer */}
+      <Box sx={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 0 }}>
+        <ParticleBackground />
       </Box>
 
-      <Grid container spacing={4}>
-        {agentsList.map((agent) => (
-          <Grid item xs={12} md={6} lg={4} key={agent.name}>
-            <AgentCard agent={agent} />
+      {/* Content Layer */}
+      <Box 
+        sx={{ 
+          position: 'relative', 
+          zIndex: 1,
+          width: '100%',
+          px: { xs: 2, sm: 4, md: 6 },
+          pt: '120px',
+          pb: '80px',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+        }}
+      >
+        <Box sx={{ width: '100%', maxWidth: '1600px' }}>
+          <Box sx={{ textAlign: 'center', mb: 8 }}>
+            <GradientText variant="h2" sx={{ mb: 3, fontWeight: 700, fontSize: '4rem' }}>
+              Meet Our Asimov-Inspired AI Agents
+            </GradientText>
+            <Typography
+              sx={{
+                color: 'rgba(255, 255, 255, 0.7)',
+                fontSize: '1.1rem',
+                maxWidth: '800px',
+                mx: 'auto',
+                lineHeight: 1.6,
+              }}
+            >
+              Drawing on the spirit of Asimov's universe, we've conceptualized a team of specialized AI agents—each playing a distinct role in guiding your product from idea to reality. Today, they're outlines of what they'll become; tomorrow, they'll plan, research, design, build, integrate, and refine your vision into something extraordinary.
+            </Typography>
+          </Box>
+
+          <Grid container spacing={4}>
+            {agentsList.map((agent) => (
+              <Grid item xs={12} md={6} lg={4} key={agent.name}>
+                <AgentCard agent={agent} />
+              </Grid>
+            ))}
           </Grid>
-        ))}
-      </Grid>
-    </Container>
+        </Box>
+      </Box>
+    </Box>
   );
 };
 
-export default Agents; 
+export default Agents;

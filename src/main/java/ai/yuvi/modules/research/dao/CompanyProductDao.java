@@ -14,6 +14,7 @@ import java.util.logging.Logger;
 
 import javax.sql.DataSource;
 
+import ai.yuvi.modules.research.enums.ProductStatus;
 import ai.yuvi.modules.research.model.CompanyProduct;
 
 public class CompanyProductDao {
@@ -80,7 +81,7 @@ public class CompanyProductDao {
             ps.setString(paramIndex++, product.getProductUrl());
             ps.setString(paramIndex++, product.getDocumentationUrl());
             ps.setString(paramIndex++, product.getApiUrl());
-            ps.setString(paramIndex++, product.getStatus());
+            ps.setString(paramIndex++, product.getStatus().name());
             
             if (product.getLaunchDate() != null) {
                 ps.setTimestamp(paramIndex++, Timestamp.from(product.getLaunchDate().toInstant()));
@@ -125,7 +126,7 @@ public class CompanyProductDao {
             ps.setString(paramIndex++, product.getProductUrl());
             ps.setString(paramIndex++, product.getDocumentationUrl());
             ps.setString(paramIndex++, product.getApiUrl());
-            ps.setString(paramIndex++, product.getStatus());
+            ps.setString(paramIndex++, product.getStatus().name());
             
             if (product.getLaunchDate() != null) {
                 ps.setTimestamp(paramIndex++, Timestamp.from(product.getLaunchDate().toInstant()));
@@ -168,7 +169,7 @@ public class CompanyProductDao {
         product.setProductUrl(rs.getString("product_url"));
         product.setDocumentationUrl(rs.getString("documentation_url"));
         product.setApiUrl(rs.getString("api_url"));
-        product.setStatus(rs.getString("status"));
+        product.setStatus(ProductStatus.valueOf(rs.getString("status")));
         
         Timestamp launchDate = rs.getTimestamp("launch_date");
         if (launchDate != null) {

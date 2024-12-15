@@ -1,86 +1,157 @@
 package ai.yuvi.modules.user.model;
 
 import java.time.ZonedDateTime;
-import java.util.List;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import ai.yuvi.modules.user.enums.UserRole;
 import ai.yuvi.modules.user.enums.UserStatus;
 
 public class User {
     private Long id;
-    private String externalId;
-    private Long companyId;
-    private String name;
+    private Long userId;
     private String email;
-    @JsonIgnore
+    private String username;
     private String password;
+    private String firstName;
+    private String lastName;
+    private String phoneNumber;
+    private String avatarUrl;
     private UserRole role;
     private UserStatus status;
-    private ZonedDateTime lastActive;
-    private String avatar;
+    private String preferences;
+    private String settings;
+    private ZonedDateTime lastLoginAt;
     private ZonedDateTime createdAt;
-    private String department;
-    private String phone;
-    private String location;
-    private String bio;
-    private List<String> skills;
-    private JsonNode preferences;
-    private JsonNode socialLinks;
+    private ZonedDateTime updatedAt;
 
     // Getters and Setters
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public Long getId() {
+        return id;
+    }
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-    public String getExternalId() { return externalId; }
-    public void setExternalId(String externalId) { this.externalId = externalId; }
+    public Long getUserId() {
+        return userId;
+    }
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
 
-    public Long getCompanyId() { return companyId; }
-    public void setCompanyId(Long companyId) { this.companyId = companyId; }
+    public String getEmail() {
+        return email;
+    }
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
+    public String getUsername() {
+        return username;
+    }
+    public void setUsername(String username) {
+        this.username = username;
+    }
 
-    public String getEmail() { return email; }
-    public void setEmail(String email) { this.email = email; }
+    public String getPassword() {
+        return password;
+    }
+    public void setPassword(String password) {
+        this.password = password;
+    }
 
-    @JsonIgnore
-    public String getPassword() { return password; }
-    public void setPassword(String password) { this.password = password; }
+    public String getFirstName() {
+        return firstName;
+    }
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
 
-    public UserRole getRole() { return role; }
-    public void setRole(UserRole role) { this.role = role; }
+    public String getLastName() {
+        return lastName;
+    }
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
 
-    public UserStatus getStatus() { return status; }
-    public void setStatus(UserStatus status) { this.status = status; }
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
 
-    public ZonedDateTime getLastActive() { return lastActive; }
-    public void setLastActive(ZonedDateTime lastActive) { this.lastActive = lastActive; }
+    public String getAvatarUrl() {
+        return avatarUrl;
+    }
+    public void setAvatarUrl(String avatarUrl) {
+        this.avatarUrl = avatarUrl;
+    }
 
-    public String getAvatar() { return avatar; }
-    public void setAvatar(String avatar) { this.avatar = avatar; }
+    public UserRole getRole() {
+        return role;
+    }
+    public void setRole(UserRole role) {
+        this.role = role;
+    }
 
-    public ZonedDateTime getCreatedAt() { return createdAt; }
-    public void setCreatedAt(ZonedDateTime createdAt) { this.createdAt = createdAt; }
+    public UserStatus getStatus() {
+        return status;
+    }
+    public void setStatus(UserStatus status) {
+        this.status = status;
+    }
 
-    public String getDepartment() { return department; }
-    public void setDepartment(String department) { this.department = department; }
+    public String getPreferences() {
+        return preferences;
+    }
+    public void setPreferences(String preferences) {
+        this.preferences = preferences;
+    }
 
-    public String getPhone() { return phone; }
-    public void setPhone(String phone) { this.phone = phone; }
+    public String getSettings() {
+        return settings;
+    }
+    public void setSettings(String settings) {
+        this.settings = settings;
+    }
 
-    public String getLocation() { return location; }
-    public void setLocation(String location) { this.location = location; }
+    public ZonedDateTime getLastLoginAt() {
+        return lastLoginAt;
+    }
+    public void setLastLoginAt(ZonedDateTime lastLoginAt) {
+        this.lastLoginAt = lastLoginAt;
+    }
 
-    public String getBio() { return bio; }
-    public void setBio(String bio) { this.bio = bio; }
+    public ZonedDateTime getCreatedAt() {
+        return createdAt;
+    }
+    public void setCreatedAt(ZonedDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
 
-    public List<String> getSkills() { return skills; }
-    public void setSkills(List<String> skills) { this.skills = skills; }
+    public ZonedDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+    public void setUpdatedAt(ZonedDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
 
-    public JsonNode getPreferences() { return preferences; }
-    public void setPreferences(JsonNode preferences) { this.preferences = preferences; }
+    // Helper methods
+    public String getFullName() {
+        StringBuilder sb = new StringBuilder();
+        if (firstName != null) {
+            sb.append(firstName);
+        }
+        if (lastName != null) {
+            if (sb.length() > 0) {
+                sb.append(" ");
+            }
+            sb.append(lastName);
+        }
+        return sb.toString();
+    }
 
-    public JsonNode getSocialLinks() { return socialLinks; }
-    public void setSocialLinks(JsonNode socialLinks) { this.socialLinks = socialLinks; }
+    public boolean isActive() {
+        return status == UserStatus.ACTIVE;
+    }
 }

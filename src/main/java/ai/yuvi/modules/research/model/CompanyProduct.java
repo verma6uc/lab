@@ -2,6 +2,8 @@ package ai.yuvi.modules.research.model;
 
 import java.time.ZonedDateTime;
 
+import ai.yuvi.modules.research.enums.ProductStatus;
+
 public class CompanyProduct {
     private Long id;
     private Long companyId;
@@ -15,7 +17,7 @@ public class CompanyProduct {
     private String productUrl;
     private String documentationUrl;
     private String apiUrl;
-    private String status;
+    private ProductStatus status;
     private ZonedDateTime launchDate;
     private ZonedDateTime createdAt;
     private ZonedDateTime updatedAt;
@@ -105,10 +107,10 @@ public class CompanyProduct {
         this.apiUrl = apiUrl;
     }
 
-    public String getStatus() {
+    public ProductStatus getStatus() {
         return status;
     }
-    public void setStatus(String status) {
+    public void setStatus(ProductStatus status) {
         this.status = status;
     }
 

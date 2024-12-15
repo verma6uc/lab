@@ -1,252 +1,189 @@
 package ai.yuvi.modules.user.dao;
 
-import java.sql.Array;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.sql.Timestamp;
 import java.sql.Types;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import javax.sql.DataSource;
 
-import ai.yuvi.config.DataSourceProvider;
 import ai.yuvi.modules.user.enums.UserRole;
 import ai.yuvi.modules.user.enums.UserStatus;
 import ai.yuvi.modules.user.model.User;
 
 public class UserDao {
     private static final Logger LOGGER = Logger.getLogger(UserDao.class.getName());
-    private static final ObjectMapper objectMapper = new ObjectMapper();
+    private final DataSource dataSource;
 
-    public Long create(User user) {
-        String sql = """
-            INSERT INTO "user" (id, company_id, name, email, password, role, status, avatar, 
-                              department, phone, location, bio, skills, preferences, social_links)
-            VALUES (?, ?, ?, ?, ?, ?::user_role, ?::user_status, ?, ?, ?, ?, ?, ?, ?::jsonb, ?::jsonb)
-            RETURNING user_id
-        """;
-
-        try (Connection conn = DataSourceProvider.getDataSource().getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            
-            int paramIndex = 1;
-            stmt.setString(paramIndex++, user.getExternalId());
-            stmt.setLong(paramIndex++, user.getCompanyId());
-            stmt.setString(paramIndex++, user.getName());
-            stmt.setString(paramIndex++, user.getEmail());
-            stmt.setString(paramIndex++, user.getPassword());
-            stmt.setString(paramIndex++, user.getRole().name());
-            stmt.setString(paramIndex++, user.getStatus().getValue());
-            stmt.setString(paramIndex++, user.getAvatar());
-            stmt.setString(paramIndex++, user.getDepartment());
-            stmt.setString(paramIndex++, user.getPhone());
-            stmt.setString(paramIndex++, user.getLocation());
-            stmt.setString(paramIndex++, user.getBio());
-            
-            // Convert List<String> to Array
-            if (user.getSkills() != null) {
-                Array skillsArray = conn.createArrayOf("text", user.getSkills().toArray());
-                stmt.setArray(paramIndex++, skillsArray);
-            } else {
-                stmt.setNull(paramIndex++, Types.ARRAY);
-            }
-
-            // Convert JsonNode to JSONB
-            setJsonbParameter(stmt, paramIndex++, user.getPreferences());
-            setJsonbParameter(stmt, paramIndex++, user.getSocialLinks());
-
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getLong(1);
-                }
-            }
-        } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error creating user", e);
-        }
-        return null;
-    }
-
-    public Optional<User> findById(Long userId) {
-        String sql = """
-            SELECT * FROM "user" WHERE user_id = ?
-        """;
-
-        try (Connection conn = DataSourceProvider.getDataSource().getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            
-            stmt.setLong(1, userId);
-            
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    return Optional.of(mapResultSetToUser(rs));
-                }
-            }
-        } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error finding user by ID", e);
-        }
-        return Optional.empty();
+    public UserDao(DataSource dataSource) {
+        this.dataSource = dataSource;
     }
 
     public Optional<User> findByEmail(String email) {
-        String sql = """
-            SELECT * FROM "user" WHERE email = ?
-        """;
-
-        try (Connection conn = DataSourceProvider.getDataSource().getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            
-            stmt.setString(1, email);
-            
-            try (ResultSet rs = stmt.executeQuery()) {
+        String sql = "SELECT * FROM users WHERE email = ?";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, email);
+            try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     return Optional.of(mapResultSetToUser(rs));
                 }
             }
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error finding user by email", e);
+            LOGGER.severe("Error finding user by email: " + e.getMessage());
         }
         return Optional.empty();
     }
 
-    public List<User> findByCompanyId(Long companyId) {
-        String sql = """
-            SELECT * FROM "user" WHERE company_id = ?
-        """;
-
-        List<User> users = new ArrayList<>();
-        try (Connection conn = DataSourceProvider.getDataSource().getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            
-            stmt.setLong(1, companyId);
-            
-            try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    users.add(mapResultSetToUser(rs));
+    public Optional<User> findById(Long id) {
+        String sql = "SELECT * FROM users WHERE id = ?";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setLong(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return Optional.of(mapResultSetToUser(rs));
                 }
             }
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error finding users by company ID", e);
+            LOGGER.severe("Error finding user by ID: " + e.getMessage());
         }
-        return users;
+        return Optional.empty();
+    }
+
+    public boolean create(User user) {
+        String sql = """
+            INSERT INTO users (
+                user_id, email, username, password, first_name, last_name,
+                phone_number, avatar_url, role, status, preferences, settings,
+                last_login_at, created_at, updated_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?::user_role, ?::user_status, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+        """;
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            int paramIndex = 1;
+            ps.setLong(paramIndex++, user.getUserId());
+            ps.setString(paramIndex++, user.getEmail());
+            ps.setString(paramIndex++, user.getUsername());
+            ps.setString(paramIndex++, user.getPassword());
+            ps.setString(paramIndex++, user.getFirstName());
+            ps.setString(paramIndex++, user.getLastName());
+            ps.setString(paramIndex++, user.getPhoneNumber());
+            ps.setString(paramIndex++, user.getAvatarUrl());
+            ps.setString(paramIndex++, user.getRole().name());
+            ps.setString(paramIndex++, user.getStatus().name());
+            ps.setString(paramIndex++, user.getPreferences());
+            ps.setString(paramIndex++, user.getSettings());
+            
+            if (user.getLastLoginAt() != null) {
+                ps.setTimestamp(paramIndex++, Timestamp.from(user.getLastLoginAt().toInstant()));
+            } else {
+                ps.setNull(paramIndex++, Types.TIMESTAMP);
+            }
+
+            int affectedRows = ps.executeUpdate();
+            if (affectedRows > 0) {
+                try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
+                    if (generatedKeys.next()) {
+                        user.setId(generatedKeys.getLong(1));
+                        return true;
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.severe("Error creating user: " + e.getMessage());
+        }
+        return false;
     }
 
     public boolean update(User user) {
         String sql = """
-            UPDATE "user" 
-            SET name = ?, email = ?, password = ?, role = ?::user_role, status = ?::user_status,
-                avatar = ?, department = ?, phone = ?, location = ?, bio = ?,
-                skills = ?, preferences = ?::jsonb, social_links = ?::jsonb,
-                last_active = NOW()
-            WHERE user_id = ?
+            UPDATE users SET 
+                email = ?, username = ?, password = ?, first_name = ?,
+                last_name = ?, phone_number = ?, avatar_url = ?,
+                role = ?::user_role, status = ?::user_status,
+                preferences = ?, settings = ?, last_login_at = ?,
+                updated_at = CURRENT_TIMESTAMP
+            WHERE id = ?
         """;
-
-        try (Connection conn = DataSourceProvider.getDataSource().getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             int paramIndex = 1;
-            stmt.setString(paramIndex++, user.getName());
-            stmt.setString(paramIndex++, user.getEmail());
-            stmt.setString(paramIndex++, user.getPassword());
-            stmt.setString(paramIndex++, user.getRole().name());
-            stmt.setString(paramIndex++, user.getStatus().getValue());
-            stmt.setString(paramIndex++, user.getAvatar());
-            stmt.setString(paramIndex++, user.getDepartment());
-            stmt.setString(paramIndex++, user.getPhone());
-            stmt.setString(paramIndex++, user.getLocation());
-            stmt.setString(paramIndex++, user.getBio());
+            ps.setString(paramIndex++, user.getEmail());
+            ps.setString(paramIndex++, user.getUsername());
+            ps.setString(paramIndex++, user.getPassword());
+            ps.setString(paramIndex++, user.getFirstName());
+            ps.setString(paramIndex++, user.getLastName());
+            ps.setString(paramIndex++, user.getPhoneNumber());
+            ps.setString(paramIndex++, user.getAvatarUrl());
+            ps.setString(paramIndex++, user.getRole().name());
+            ps.setString(paramIndex++, user.getStatus().name());
+            ps.setString(paramIndex++, user.getPreferences());
+            ps.setString(paramIndex++, user.getSettings());
             
-            if (user.getSkills() != null) {
-                Array skillsArray = conn.createArrayOf("text", user.getSkills().toArray());
-                stmt.setArray(paramIndex++, skillsArray);
+            if (user.getLastLoginAt() != null) {
+                ps.setTimestamp(paramIndex++, Timestamp.from(user.getLastLoginAt().toInstant()));
             } else {
-                stmt.setNull(paramIndex++, Types.ARRAY);
+                ps.setNull(paramIndex++, Types.TIMESTAMP);
             }
+            
+            ps.setLong(paramIndex++, user.getId());
 
-            setJsonbParameter(stmt, paramIndex++, user.getPreferences());
-            setJsonbParameter(stmt, paramIndex++, user.getSocialLinks());
-            stmt.setLong(paramIndex++, user.getId());
-
-            return stmt.executeUpdate() > 0;
+            return ps.executeUpdate() > 0;
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error updating user", e);
+            LOGGER.severe("Error updating user: " + e.getMessage());
             return false;
         }
     }
 
-    public boolean delete(Long userId) {
-        String sql = """
-            DELETE FROM "user" WHERE user_id = ?
-        """;
-
-        try (Connection conn = DataSourceProvider.getDataSource().getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            
-            stmt.setLong(1, userId);
-            return stmt.executeUpdate() > 0;
+    public boolean delete(Long id) {
+        String sql = "DELETE FROM users WHERE id = ?";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setLong(1, id);
+            return ps.executeUpdate() > 0;
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error deleting user", e);
+            LOGGER.severe("Error deleting user: " + e.getMessage());
             return false;
         }
     }
 
     private User mapResultSetToUser(ResultSet rs) throws SQLException {
         User user = new User();
-        user.setId(rs.getLong("user_id"));
-        user.setExternalId(rs.getString("id"));
-        user.setCompanyId(rs.getLong("company_id"));
-        user.setName(rs.getString("name"));
+        user.setId(rs.getLong("id"));
+        user.setUserId(rs.getLong("user_id"));
         user.setEmail(rs.getString("email"));
+        user.setUsername(rs.getString("username"));
         user.setPassword(rs.getString("password"));
+        user.setFirstName(rs.getString("first_name"));
+        user.setLastName(rs.getString("last_name"));
+        user.setPhoneNumber(rs.getString("phone_number"));
+        user.setAvatarUrl(rs.getString("avatar_url"));
         user.setRole(UserRole.valueOf(rs.getString("role")));
-        user.setStatus(UserStatus.fromString(rs.getString("status")));
-        user.setLastActive(rs.getObject("last_active", Timestamp.class) != null ? 
-            rs.getObject("last_active", Timestamp.class).toInstant().atZone(java.time.ZoneId.systemDefault()) : null);
-        user.setAvatar(rs.getString("avatar"));
-        user.setCreatedAt(rs.getObject("created_at", Timestamp.class).toInstant().atZone(java.time.ZoneId.systemDefault()));
-        user.setDepartment(rs.getString("department"));
-        user.setPhone(rs.getString("phone"));
-        user.setLocation(rs.getString("location"));
-        user.setBio(rs.getString("bio"));
-
-        Array skillsArray = rs.getArray("skills");
-        if (skillsArray != null) {
-            user.setSkills(Arrays.asList((String[]) skillsArray.getArray()));
+        user.setStatus(UserStatus.valueOf(rs.getString("status")));
+        user.setPreferences(rs.getString("preferences"));
+        user.setSettings(rs.getString("settings"));
+        
+        Timestamp lastLoginAt = rs.getTimestamp("last_login_at");
+        if (lastLoginAt != null) {
+            user.setLastLoginAt(lastLoginAt.toInstant().atZone(java.time.ZoneId.systemDefault()));
         }
-
-        String preferencesJson = rs.getString("preferences");
-        if (preferencesJson != null) {
-            try {
-                user.setPreferences(objectMapper.readTree(preferencesJson));
-            } catch (Exception e) {
-                LOGGER.log(Level.WARNING, "Error parsing preferences JSON", e);
-            }
+        
+        Timestamp createdAt = rs.getTimestamp("created_at");
+        if (createdAt != null) {
+            user.setCreatedAt(createdAt.toInstant().atZone(java.time.ZoneId.systemDefault()));
         }
-
-        String socialLinksJson = rs.getString("social_links");
-        if (socialLinksJson != null) {
-            try {
-                user.setSocialLinks(objectMapper.readTree(socialLinksJson));
-            } catch (Exception e) {
-                LOGGER.log(Level.WARNING, "Error parsing social links JSON", e);
-            }
+        
+        Timestamp updatedAt = rs.getTimestamp("updated_at");
+        if (updatedAt != null) {
+            user.setUpdatedAt(updatedAt.toInstant().atZone(java.time.ZoneId.systemDefault()));
         }
-
+        
         return user;
-    }
-
-    private void setJsonbParameter(PreparedStatement stmt, int index, JsonNode jsonNode) throws SQLException {
-        if (jsonNode != null) {
-            stmt.setString(index, jsonNode.toString());
-        } else {
-            stmt.setNull(index, Types.OTHER);
-        }
     }
 }

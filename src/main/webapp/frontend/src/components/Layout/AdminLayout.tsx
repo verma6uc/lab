@@ -6,24 +6,49 @@ import ParticleBackground from '../shared/ParticleBackground';
 
 const AdminLayout = () => {
   return (
-    <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: '#070E1A' }}>
+    <Box 
+      component="div"
+      sx={{ 
+        display: 'flex', 
+        minHeight: '100vh', 
+        bgcolor: '#070E1A' 
+      }}
+    >
       <Sidebar />
       <Box 
-        component="main" 
+        component="div" 
         sx={{ 
           flexGrow: 1,
           minHeight: '100vh',
           position: 'relative',
-          pt: 4, // Reduced top padding
+          pt: 4,
         }}
       >
         <ParticleBackground />
-        <Box sx={{ position: 'relative', zIndex: 1 }}>
-          <Outlet />
+        <Box 
+          component="div" 
+          sx={{ 
+            position: 'relative', 
+            zIndex: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            minHeight: '100%',
+          }}
+        >
+          <Box 
+            component="div" 
+            sx={{ 
+              flexGrow: 1,
+              display: 'flex',
+              flexDirection: 'column',
+            }}
+          >
+            <Outlet />
+          </Box>
         </Box>
       </Box>
     </Box>
   );
 };
 
-export default AdminLayout; 
+export default AdminLayout;

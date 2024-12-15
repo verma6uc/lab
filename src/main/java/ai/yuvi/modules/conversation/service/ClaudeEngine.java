@@ -1,23 +1,23 @@
 package ai.yuvi.modules.conversation.service;
 
-import ai.yuvi.modules.conversation.model.Conversation;
-import ai.yuvi.modules.conversation.model.ConversationMessage;
-import ai.yuvi.modules.conversation.enums.MessageType;
-import ai.yuvi.modules.conversation.dao.ConversationDao;
-import ai.yuvi.modules.conversation.dao.ConversationMessageDao;
-
+import java.time.Instant;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
-import java.util.logging.Logger;
 import java.util.logging.Level;
-import java.time.ZonedDateTime;
-import java.time.Instant;
+import java.util.logging.Logger;
 
-import com.anthropic.claude.Claude;
-import com.anthropic.claude.Messages;
-import com.anthropic.claude.Message;
+import ai.yuvi.modules.conversation.dao.ConversationDao;
+import ai.yuvi.modules.conversation.dao.ConversationMessageDao;
+import ai.yuvi.modules.conversation.enums.MessageType;
+import ai.yuvi.modules.conversation.model.Conversation;
+import ai.yuvi.modules.conversation.model.ConversationMessage;
+import ai.yuvi.modules.conversation.model.claude.Claude;
+import ai.yuvi.modules.conversation.model.claude.Message;
+import ai.yuvi.modules.conversation.model.claude.Messages;
 
 public class ClaudeEngine {
     private static final Logger LOGGER = Logger.getLogger(ClaudeEngine.class.getName());

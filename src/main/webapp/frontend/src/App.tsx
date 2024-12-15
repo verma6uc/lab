@@ -1,15 +1,25 @@
 import React from 'react';
+import { ThemeProvider, CssBaseline, Box } from '@mui/material';
 import { RouterProvider } from 'react-router-dom';
 import { router } from './routes';
-import AppTheme from './theme/AppTheme';
-import LiveSessions from './pages/admin/LiveSessions';
-import SecurityAudit from './pages/admin/SecurityAudit';
+import { theme } from './theme';
 
-const App = () => {
+const App: React.FC = () => {
   return (
-    <AppTheme>
-      <RouterProvider router={router} />
-    </AppTheme>
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <Box sx={{ 
+        minHeight: '100vh',
+        bgcolor: '#020914', // Dark background color
+        color: 'white',
+        position: 'relative',
+        '& canvas': {
+          mixBlendMode: 'screen', // This will make particles blend better with the dark background
+        }
+      }}>
+        <RouterProvider router={router} />
+      </Box>
+    </ThemeProvider>
   );
 };
 

@@ -1,29 +1,41 @@
 import React from 'react';
-import { FaBrain, FaSearch, FaLightbulb, FaPaintBrush, FaDatabase, FaCogs, FaNetworkWired, FaClipboardCheck, FaRocket } from 'react-icons/fa';
+import { SvgIcon, SvgIconProps } from '@mui/material';
+import PsychologyIcon from '@mui/icons-material/Psychology';
+import AutoGraphIcon from '@mui/icons-material/AutoGraph';
+import ArchitectureIcon from '@mui/icons-material/Architecture';
+import IntegrationInstructionsIcon from '@mui/icons-material/IntegrationInstructions';
+import SpeedIcon from '@mui/icons-material/Speed';
+import BiotechIcon from '@mui/icons-material/Biotech';
+import AccountTreeIcon from '@mui/icons-material/AccountTree';
+import DataObjectIcon from '@mui/icons-material/DataObject';
 
-interface IconProps {
+interface CustomIconProps extends Omit<SvgIconProps, 'color'> {
   size?: number;
   color?: string;
 }
 
-const SeldonIcon: React.FC<IconProps> = ({ size = 24, color = '#000' }) => <FaBrain size={size} color={color} />;
-const BaleyIcon: React.FC<IconProps> = ({ size = 24, color = '#000' }) => <FaSearch size={size} color={color} />;
-const FastolfeIcon: React.FC<IconProps> = ({ size = 24, color = '#000' }) => <FaLightbulb size={size} color={color} />;
-const DorsIcon: React.FC<IconProps> = ({ size = 24, color = '#000' }) => <FaPaintBrush size={size} color={color} />;
-const DaneelIcon: React.FC<IconProps> = ({ size = 24, color = '#000' }) => <FaDatabase size={size} color={color} />;
-const AmadiroIcon: React.FC<IconProps> = ({ size = 24, color = '#000' }) => <FaCogs size={size} color={color} />;
-const GiskardIcon: React.FC<IconProps> = ({ size = 24, color = '#000' }) => <FaNetworkWired size={size} color={color} />;
-const CalvinIcon: React.FC<IconProps> = ({ size = 24, color = '#000' }) => <FaClipboardCheck size={size} color={color} />;
-const VasiliaIcon: React.FC<IconProps> = ({ size = 24, color = '#000' }) => <FaRocket size={size} color={color} />;
+const createAgentIcon = (IconComponent: typeof SvgIcon) => {
+  return ({ size = 24, color = 'inherit', sx, ...props }: CustomIconProps) => (
+    <IconComponent
+      {...props}
+      sx={{
+        width: size,
+        height: size,
+        color: color,
+        ...sx,
+      }}
+    />
+  );
+};
 
 export const AgentIconMap = {
-  Seldon: SeldonIcon,
-  Baley: BaleyIcon,
-  Fastolfe: FastolfeIcon,
-  Dors: DorsIcon,
-  Daneel: DaneelIcon,
-  Amadiro: AmadiroIcon,
-  Giskard: GiskardIcon,
-  Calvin: CalvinIcon,
-  Vasilia: VasiliaIcon
-}; 
+  Baley: createAgentIcon(PsychologyIcon),
+  Seldon: createAgentIcon(AutoGraphIcon),
+  Daneel: createAgentIcon(ArchitectureIcon),
+  Calvin: createAgentIcon(BiotechIcon),
+  Giskard: createAgentIcon(IntegrationInstructionsIcon),
+  Vasilia: createAgentIcon(SpeedIcon),
+  Amadiro: createAgentIcon(AccountTreeIcon),
+  Fastolfe: createAgentIcon(DataObjectIcon),
+  Dors: createAgentIcon(IntegrationInstructionsIcon),
+};

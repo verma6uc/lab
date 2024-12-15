@@ -6,6 +6,7 @@ import ai.yuvi.modules.conversation.enums.ConversationStatus;
 
 public class Conversation {
     private Long id;
+    private Long conversationId;
     private Long userId;
     private Long companyId;
     private String title;
@@ -25,6 +26,13 @@ public class Conversation {
     }
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Long getConversationId() {
+        return conversationId;
+    }
+    public void setConversationId(Long conversationId) {
+        this.conversationId = conversationId;
     }
 
     public Long getUserId() {

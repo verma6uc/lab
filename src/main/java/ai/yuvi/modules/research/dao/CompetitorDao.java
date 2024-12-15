@@ -14,6 +14,7 @@ import java.util.logging.Logger;
 
 import javax.sql.DataSource;
 
+import ai.yuvi.modules.research.enums.CompetitorStatus;
 import ai.yuvi.modules.research.model.Competitor;
 
 public class CompetitorDao {
@@ -73,7 +74,7 @@ public class CompetitorDao {
             ps.setLong(paramIndex++, competitor.getCompanyId());
             ps.setString(paramIndex++, competitor.getName());
             ps.setString(paramIndex++, competitor.getType());
-            ps.setString(paramIndex++, competitor.getStatus());
+            ps.setString(paramIndex++, competitor.getStatus().name());
             ps.setString(paramIndex++, competitor.getDescription());
             ps.setString(paramIndex++, competitor.getStrengthsWeaknesses());
             ps.setString(paramIndex++, competitor.getMarketShare());
@@ -126,7 +127,7 @@ public class CompetitorDao {
             int paramIndex = 1;
             ps.setString(paramIndex++, competitor.getName());
             ps.setString(paramIndex++, competitor.getType());
-            ps.setString(paramIndex++, competitor.getStatus());
+            ps.setString(paramIndex++, competitor.getStatus().name());
             ps.setString(paramIndex++, competitor.getDescription());
             ps.setString(paramIndex++, competitor.getStrengthsWeaknesses());
             ps.setString(paramIndex++, competitor.getMarketShare());
@@ -175,7 +176,7 @@ public class CompetitorDao {
         competitor.setCompanyId(rs.getLong("company_id"));
         competitor.setName(rs.getString("name"));
         competitor.setType(rs.getString("type"));
-        competitor.setStatus(rs.getString("status"));
+        competitor.setStatus(CompetitorStatus.valueOf(rs.getString("status")));
         competitor.setDescription(rs.getString("description"));
         competitor.setStrengthsWeaknesses(rs.getString("strengths_weaknesses"));
         competitor.setMarketShare(rs.getString("market_share"));

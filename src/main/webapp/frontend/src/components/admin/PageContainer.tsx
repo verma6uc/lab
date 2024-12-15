@@ -9,6 +9,7 @@ import {
   Menu,
   MenuItem,
   Container,
+  Grid,
 } from '@mui/material';
 import {
   Search as SearchIcon,
@@ -16,14 +17,19 @@ import {
   Add as AddIcon,
 } from '@mui/icons-material';
 
+interface FilterOption {
+  value: string;
+  label: string;
+}
+
 interface PageContainerProps {
   icon?: React.ReactNode;
   title: string;
   onSearch?: (value: string) => void;
-  onFilter?: () => void;
+  onFilter?: (value: string) => void;
   onAdd?: () => void;
   addButtonLabel?: string;
-  filterOptions?: string[];
+  filterOptions?: FilterOption[];
   searchPlaceholder?: string;
   children: React.ReactNode;
 }
@@ -41,14 +47,22 @@ const PageContainer: React.FC<PageContainerProps> = ({
 }) => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
+  const handleFilterClick = (value: string) => {
+    if (onFilter) {
+      onFilter(value);
+      setAnchorEl(null);
+    }
+  };
+
   return (
-    <Box sx={{ mt: -4 }}>
+    <Box component="div" sx={{ mt: -4 }}>
       {/* Header Section with full-width glass effect */}
       <Box 
+        component="div"
         sx={{ 
           width: '100%',
-          bgcolor: 'rgba(255, 255, 255, 0.03)',
-          backdropFilter: 'blur(20px)',
+          bgcolor: 'rgba(17, 25, 40, 0.75)',
+          backdropFilter: 'blur(16px)',
           borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
           mb: 4,
           py: 3,
@@ -56,82 +70,91 @@ const PageContainer: React.FC<PageContainerProps> = ({
       >
         <Container maxWidth="xl">
           <Box 
+            component="div"
             sx={{ 
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
             }}
           >
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <Box 
+              component="div"
+              sx={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: 2 
+              }}
+            >
               {icon && (
                 <Box 
+                  component="div"
                   sx={{ 
-                    color: 'primary.main',
+                    color: '#00A3FF',
                     display: 'flex',
                     alignItems: 'center',
-                    fontSize: '2rem', // Make icon bigger
+                    fontSize: '1.5rem',
                     '& > svg': {
                       fontSize: 'inherit',
+                      strokeWidth: 1,
+                      stroke: 'currentColor'
                     },
                   }}
                 >
                   {icon}
                 </Box>
               )}
-              <Box>
-                <Typography 
-                  variant="h4" 
-                  sx={{ 
-                    color: 'white',
-                    fontWeight: 600,
-                    letterSpacing: '0.5px',
-                  }}
-                >
-                  {title}
-                </Typography>
-              </Box>
+              <Typography 
+                component="div"
+                variant="h4" 
+                sx={{ 
+                  color: 'white',
+                  fontWeight: 600,
+                  letterSpacing: '0.5px',
+                  fontSize: '1.5rem'
+                }}
+              >
+                {title}
+              </Typography>
             </Box>
 
             <Box 
+              component="div"
               sx={{ 
                 display: 'flex', 
                 alignItems: 'center', 
                 gap: 2,
-                '& > *': { // Add hover effect to all children
-                  transition: 'transform 0.2s ease-in-out',
-                  '&:hover': {
-                    transform: 'translateY(-2px)',
-                  },
-                },
               }}
             >
               {onSearch && (
                 <TextField
-                  size="medium" // Make search box bigger
+                  size="small"
                   placeholder={searchPlaceholder}
                   onChange={(e) => onSearch(e.target.value)}
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
-                        <SearchIcon sx={{ color: 'primary.main' }} />
+                        <SearchIcon sx={{ color: '#00A3FF', fontSize: '1.25rem' }} />
                       </InputAdornment>
                     ),
                   }}
                   sx={{
-                    width: 300,
+                    width: 250,
                     '& .MuiOutlinedInput-root': {
-                      bgcolor: 'rgba(255, 255, 255, 0.05)',
-                      backdropFilter: 'blur(10px)',
-                      borderRadius: 2,
+                      bgcolor: 'rgba(17, 25, 40, 0.75)',
+                      backdropFilter: 'blur(16px)',
+                      borderRadius: 1.5,
+                      border: '1px solid rgba(255, 255, 255, 0.1)',
+                      transition: 'all 0.2s ease',
                       '&:hover': {
-                        bgcolor: 'rgba(255, 255, 255, 0.08)',
+                        border: '1px solid rgba(255, 255, 255, 0.2)',
                       },
                       '& fieldset': {
-                        borderColor: 'rgba(255, 255, 255, 0.1)',
+                        border: 'none',
                       },
                     },
                     '& .MuiOutlinedInput-input': {
                       color: 'white',
+                      fontSize: '0.875rem',
                     },
                   }}
                 />
@@ -140,18 +163,20 @@ const PageContainer: React.FC<PageContainerProps> = ({
               {onFilter && (
                 <>
                   <IconButton 
-                    size="large" // Make filter button bigger
+                    size="small"
                     onClick={(e) => setAnchorEl(e.currentTarget)}
                     sx={{ 
                       color: 'white',
-                      bgcolor: 'rgba(255, 255, 255, 0.05)',
-                      p: 2,
+                      bgcolor: 'rgba(17, 25, 40, 0.75)',
+                      border: '1px solid rgba(255, 255, 255, 0.1)',
+                      p: 1,
                       '&:hover': {
-                        bgcolor: 'rgba(255, 255, 255, 0.08)',
+                        bgcolor: 'rgba(17, 25, 40, 0.85)',
+                        border: '1px solid rgba(255, 255, 255, 0.2)',
                       },
                     }}
                   >
-                    <FilterIcon />
+                    <FilterIcon sx={{ fontSize: '1.25rem' }} />
                   </IconButton>
                   <Menu
                     anchorEl={anchorEl}
@@ -159,32 +184,40 @@ const PageContainer: React.FC<PageContainerProps> = ({
                     onClose={() => setAnchorEl(null)}
                     PaperProps={{
                       sx: {
-                        mt: 2,
-                        bgcolor: 'rgba(0, 0, 0, 0.8)',
-                        backdropFilter: 'blur(20px)',
+                        mt: 1,
+                        width: '500px',
+                        maxHeight: '400px',
+                        bgcolor: 'rgba(17, 25, 40, 0.95)',
+                        backdropFilter: 'blur(16px)',
                         border: '1px solid rgba(255, 255, 255, 0.1)',
-                        borderRadius: 2,
+                        borderRadius: 1.5,
                         boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)',
+                        overflowY: 'auto',
                       },
                     }}
                   >
-                    {filterOptions.map((option) => (
-                      <MenuItem 
-                        key={option}
-                        onClick={() => {
-                          onFilter();
-                          setAnchorEl(null);
-                        }}
-                        sx={{
-                          color: 'white',
-                          '&:hover': {
-                            bgcolor: 'rgba(255, 255, 255, 0.1)',
-                          },
-                        }}
-                      >
-                        {option}
-                      </MenuItem>
-                    ))}
+                    <Grid container spacing={0}>
+                      {filterOptions.map((option) => (
+                        <Grid item xs={4} key={option.value}>
+                          <MenuItem 
+                            onClick={() => handleFilterClick(option.value)}
+                            sx={{
+                              color: 'white',
+                              justifyContent: 'center',
+                              minHeight: '40px',
+                              fontSize: '0.875rem',
+                              borderRight: '1px solid rgba(255, 255, 255, 0.05)',
+                              borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
+                              '&:hover': {
+                                bgcolor: 'rgba(255, 255, 255, 0.1)',
+                              },
+                            }}
+                          >
+                            {option.label}
+                          </MenuItem>
+                        </Grid>
+                      ))}
+                    </Grid>
                   </Menu>
                 </>
               )}
@@ -192,16 +225,21 @@ const PageContainer: React.FC<PageContainerProps> = ({
               {onAdd && (
                 <Button
                   variant="contained"
-                  size="large" // Make button bigger
-                  startIcon={<AddIcon />}
+                  size="small"
+                  startIcon={<AddIcon sx={{ fontSize: '1.25rem' }} />}
                   onClick={onAdd}
                   sx={{
-                    bgcolor: 'primary.main',
-                    px: 3,
+                    bgcolor: 'rgba(0, 163, 255, 0.15)',
+                    border: '1px solid rgba(0, 163, 255, 0.5)',
+                    color: '#00A3FF',
+                    px: 2,
                     py: 1,
-                    borderRadius: 2,
+                    borderRadius: 1.5,
+                    fontSize: '0.875rem',
+                    textTransform: 'none',
                     '&:hover': {
-                      bgcolor: 'primary.dark',
+                      bgcolor: 'rgba(0, 163, 255, 0.25)',
+                      border: '1px solid rgba(0, 163, 255, 0.6)',
                     },
                   }}
                 >
@@ -215,7 +253,7 @@ const PageContainer: React.FC<PageContainerProps> = ({
 
       {/* Content Section */}
       <Container maxWidth="xl">
-        <Box sx={{ pb: 4 }}>
+        <Box component="div" sx={{ pb: 4 }}>
           {children}
         </Box>
       </Container>
@@ -223,4 +261,4 @@ const PageContainer: React.FC<PageContainerProps> = ({
   );
 };
 
-export default PageContainer; 
+export default PageContainer;

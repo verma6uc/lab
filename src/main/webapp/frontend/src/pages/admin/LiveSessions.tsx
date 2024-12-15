@@ -3,65 +3,33 @@ import {
   Box,
   Grid,
   Card,
-  CardContent,
   Typography,
   Chip,
-  Paper,
-  Container,
-  IconButton,
-  Divider,
-  Menu,
-  MenuItem,
-  Button,
-  Stack,
-  TextField,
-  InputAdornment,
-  Autocomplete,
+  CircularProgress,
+  Alert,
 } from '@mui/material';
 import {
-  Search,
-  FilterAlt,
   DevicesOther,
-  Language,
   Timer,
   LocationOn,
-  Refresh,
   Visibility,
 } from '@mui/icons-material';
-import {
-  MapContainer,
-  TileLayer,
-  Marker,
-  Popup,
-} from 'react-leaflet';
-import 'leaflet/dist/leaflet.css';
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip as RechartsTooltip,
-  Legend,
-  PieChart,
-  Pie,
-  Cell,
-} from 'recharts';
-import AdminPageWrapper from '../../components/admin/AdminPageWrapper';
-import { sessionService, SessionFilters, SessionStats } from '../../services/sessionService';
-import { Session } from '../../types/models';
-import '../../utils/leaflet-icons';
+import { Session, DeviceType, BrowserType, SessionStatus } from '../../types/models';
+import { sessionService } from '../../services/sessionService';
 import PageContainer from '../../components/admin/PageContainer';
 
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
+// Helper function to format filter options
+const formatFilterName = (value: string): string => {
+  return value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
+};
 
-const getStatusColor = (status: string) => {
+const getStatusColor = (status: SessionStatus) => {
   switch (status) {
-    case 'Active':
+    case SessionStatus.ACTIVE:
       return 'success';
-    case 'Idle':
+    case SessionStatus.IDLE:
       return 'warning';
-    case 'Disconnected':
+    case SessionStatus.DISCONNECTED:
       return 'error';
     default:
       return 'default';
@@ -140,7 +108,7 @@ const SessionCard: React.FC<{ session: Session }> = ({ session }) => (
               backgroundClip: 'text',
               textFillColor: 'transparent',
             }}>
-              {session.browser} {session.version}
+              {session.browser} {session.browserVersion}
             </Typography>
             <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)' }}>
               {session.deviceType}
@@ -160,7 +128,7 @@ const SessionCard: React.FC<{ session: Session }> = ({ session }) => (
             }}
           >
             <LocationOn sx={{ mr: 1, fontSize: 16, color: '#2196F3' }} />
-            {session.location.city}, {session.location.country}
+            {session.location?.city}, {session.location?.country}
           </Typography>
           <Typography 
             variant="body2" 
@@ -206,7 +174,7 @@ const SessionCard: React.FC<{ session: Session }> = ({ session }) => (
             }}
           >
             <Timer sx={{ fontSize: 14, mr: 0.5 }} />
-            Last Activity: {formatLastActivity(session.lastActivity)}
+            Last Activity: {formatLastActivity(session.lastActivityTime)}
           </Typography>
         </Box>
       </Box>
@@ -216,406 +184,110 @@ const SessionCard: React.FC<{ session: Session }> = ({ session }) => (
 
 const LiveSessions: React.FC = () => {
   const [sessions, setSessions] = useState<Session[]>([]);
-  const [stats, setStats] = useState<SessionStats | null>(null);
+  const [filteredSessions, setFilteredSessions] = useState<Session[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedLocation, setSelectedLocation] = useState<string | null>(null);
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [filters, setFilters] = useState<SessionFilters>({
-    status: [],
-    browser: [],
-    deviceType: [],
-    searchTerm: '',
-  });
-
-  const filterOptions = {
-    status: ['Active', 'Idle', 'Disconnected'],
-    browser: ['Chrome', 'Firefox', 'Safari', 'Edge'],
-    deviceType: ['desktop', 'mobile', 'tablet'],
-  };
+  const [error, setError] = useState<string | null>(null);
+  const [selectedFilter, setSelectedFilter] = useState<string>('ALL');
 
   useEffect(() => {
     fetchSessions();
-    fetchStats();
-  }, [filters]);
+  }, []);
 
   const fetchSessions = async () => {
     try {
       setLoading(true);
-      const data = await sessionService.getLiveSessions(filters);
-      setSessions(data);
+      setError(null);
+      const response = await sessionService.getAll();
+      if (Array.isArray(response)) {
+        setSessions(response);
+        setFilteredSessions(response);
+      } else {
+        setSessions([]);
+        setFilteredSessions([]);
+        setError('Invalid data format received from server');
+      }
     } catch (error) {
       console.error('Error fetching sessions:', error);
-      // Handle error (show notification, etc.)
+      setError('Failed to fetch sessions. Please try again later.');
+      setSessions([]);
+      setFilteredSessions([]);
     } finally {
       setLoading(false);
     }
   };
 
-  const fetchStats = async () => {
-    try {
-      const data = await sessionService.getSessionStats();
-      setStats(data);
-    } catch (error) {
-      console.error('Error fetching stats:', error);
-      // Handle error
-    }
-  };
-
-  const handleExport = async () => {
-    try {
-      const blob = await sessionService.exportSessions(filters);
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'sessions-export.csv';
-      a.click();
-      window.URL.revokeObjectURL(url);
-    } catch (error) {
-      console.error('Error exporting sessions:', error);
-      // Handle error
-    }
-  };
-
-  const filteredSessions = useMemo(() => {
-    let filteredSessions = sessions;
-
-    if (selectedLocation) {
-      filteredSessions = filteredSessions.filter(
-        session => session.location.city === selectedLocation
-      );
-    }
-
-    if (filters.status.length > 0) {
-      filteredSessions = filteredSessions.filter(session => 
-        filters.status.includes(session.status)
-      );
-    }
-
-    if (filters.browser.length > 0) {
-      filteredSessions = filteredSessions.filter(session => 
-        filters.browser.includes(session.browser)
-      );
-    }
-
-    if (filters.deviceType.length > 0) {
-      filteredSessions = filteredSessions.filter(session => 
-        filters.deviceType.includes(session.deviceType)
-      );
-    }
-
-    if (filters.searchTerm) {
-      const searchLower = filters.searchTerm.toLowerCase();
-      filteredSessions = filteredSessions.filter(session => 
-        session.location.city.toLowerCase().includes(searchLower) ||
-        session.location.country.toLowerCase().includes(searchLower) ||
-        session.ipAddress.includes(searchLower) ||
-        session.browser.toLowerCase().includes(searchLower)
-      );
-    }
-
-    return filteredSessions;
-  }, [sessions, selectedLocation, filters]);
-
-  const MapView: React.FC = () => {
-    const [isMapReady, setIsMapReady] = useState(false);
-
-    return (
-      <Card 
-        elevation={0}
-        sx={{ 
-          height: 400, 
-          mb: 3,
-          background: 'rgba(255, 255, 255, 0.05)',
-          backdropFilter: 'blur(10px)',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
-        }}
-      >
-        <Box sx={{ p: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <LocationOn sx={{ mr: 1, color: 'primary.main' }} />
-            <Typography variant="h6">Global Session Distribution</Typography>
-          </Box>
-          <IconButton onClick={() => setSelectedLocation(null)}>
-            <Refresh />
-          </IconButton>
-        </Box>
-        <Divider sx={{ opacity: 0.1 }} />
-        <MapContainer
-          center={[0, 0]}
-          zoom={2}
-          style={{ height: 'calc(100% - 60px)', width: '100%' }}
-          whenReady={() => setIsMapReady(true)}
-        >
-          <TileLayer 
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-          />
-          {isMapReady && filteredSessions.map((session) => (
-            <Marker
-              key={session.id}
-              position={session.location.coordinates}
-              eventHandlers={{
-                click: () => setSelectedLocation(session.location.city),
-              }}
-            >
-              <Popup>
-                <Box sx={{ p: 1 }}>
-                  <Typography variant="subtitle2" sx={{ fontWeight: 'bold' }}>
-                    {session.location.city}, {session.location.country}
-                  </Typography>
-                  <Typography variant="body2">
-                    Active Sessions: {
-                      filteredSessions.filter(s => 
-                        s.location.city === session.location.city
-                      ).length
-                    }
-                  </Typography>
-                </Box>
-              </Popup>
-            </Marker>
-          ))}
-        </MapContainer>
-      </Card>
+  const handleSearch = (value: string) => {
+    const searchTerm = value.toLowerCase();
+    const filtered = sessions.filter(session => 
+      session.browser.toLowerCase().includes(searchTerm) ||
+      session.deviceType.toLowerCase().includes(searchTerm) ||
+      session.location?.city?.toLowerCase().includes(searchTerm) ||
+      session.location?.country?.toLowerCase().includes(searchTerm) ||
+      session.ipAddress.toLowerCase().includes(searchTerm)
     );
+    setFilteredSessions(filtered);
   };
 
-  const StatisticsView: React.FC = () => {
-    if (!stats) {
-      return null; // or return a loading state
+  // Create filter options
+  const filterOptions = [
+    { value: 'ALL', label: 'All Sessions' },
+    ...Object.values(SessionStatus).map(status => ({
+      value: status,
+      label: formatFilterName(status)
+    })),
+    ...Object.values(DeviceType).map(type => ({
+      value: type,
+      label: formatFilterName(type)
+    })),
+    ...Object.values(BrowserType).map(browser => ({
+      value: browser,
+      label: formatFilterName(browser)
+    }))
+  ];
+
+  const handleFilter = (value: string) => {
+    setSelectedFilter(value);
+    
+    if (value === 'ALL') {
+      setFilteredSessions(sessions);
+      return;
     }
 
-    return (
-      <Grid container spacing={3} sx={{ mb: 4 }}>
-        <Grid item xs={12} md={6}>
-          <Card 
-            elevation={0}
-            sx={{ 
-              background: 'rgba(255, 255, 255, 0.05)',
-              backdropFilter: 'blur(10px)',
-              border: '1px solid rgba(255, 255, 255, 0.1)',
-            }}
-          >
-            <CardContent>
-              <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                <Typography variant="h6">Sessions by Status</Typography>
-              </Box>
-              <PieChart width={400} height={300}>
-                <Pie
-                  data={Object.entries(stats.byStatus || {}).map(([name, value]) => ({
-                    name,
-                    value,
-                  }))}
-                  cx={200}
-                  cy={150}
-                  labelLine={false}
-                  outerRadius={80}
-                  fill="#8884d8"
-                  dataKey="value"
-                >
-                  {Object.entries(stats.byStatus || {}).map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Pie>
-                <RechartsTooltip contentStyle={{ background: '#1a2035', border: 'none' }} />
-                <Legend />
-              </PieChart>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        <Grid item xs={12} md={6}>
-          <Card 
-            elevation={0}
-            sx={{ 
-              background: 'rgba(255, 255, 255, 0.05)',
-              backdropFilter: 'blur(10px)',
-              border: '1px solid rgba(255, 255, 255, 0.1)',
-            }}
-          >
-            <CardContent>
-              <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                <Typography variant="h6">Sessions by Device</Typography>
-              </Box>
-              <BarChart width={400} height={300} data={
-                Object.entries(stats.byDevice || {}).map(([name, value]) => ({
-                  name,
-                  sessions: value,
-                }))
-              }>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-                <XAxis dataKey="name" stroke="#fff" />
-                <YAxis stroke="#fff" />
-                <RechartsTooltip contentStyle={{ background: '#1a2035', border: 'none' }} />
-                <Legend />
-                <Bar dataKey="sessions" fill="#8884d8" />
-              </BarChart>
-            </CardContent>
-          </Card>
-        </Grid>
-      </Grid>
+    const filtered = sessions.filter(session => 
+      session.status === value ||
+      session.deviceType === value ||
+      session.browser === value
     );
+    setFilteredSessions(filtered);
   };
-
-  const FilterMenu: React.FC = () => (
-    <>
-      <Stack direction="row" spacing={2} sx={{ mb: 3 }}>
-        <TextField
-          size="small"
-          placeholder="Search sessions..."
-          value={filters.searchTerm}
-          onChange={(e) => setFilters(prev => ({ ...prev, searchTerm: e.target.value }))}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <Search />
-              </InputAdornment>
-            ),
-          }}
-          sx={{ width: 300 }}
-        />
-        <Button
-          variant="outlined"
-          startIcon={<FilterAlt />}
-          onClick={(e) => setAnchorEl(e.currentTarget)}
-          color={Object.values(filters).some(f => 
-            Array.isArray(f) ? f.length > 0 : f.searchTerm !== ''
-          ) ? 'primary' : 'inherit'}
-        >
-          Filters
-        </Button>
-        {Object.values(filters).some(f => 
-          Array.isArray(f) ? f.length > 0 : f.searchTerm !== ''
-        ) && (
-          <Button
-            variant="outlined"
-            color="error"
-            onClick={() => setFilters({
-              status: [],
-              browser: [],
-              deviceType: [],
-              duration: { min: 0, max: 120 },
-              searchTerm: '',
-            })}
-          >
-            Clear Filters
-          </Button>
-        )}
-      </Stack>
-
-      <Menu
-        anchorEl={anchorEl}
-        open={Boolean(anchorEl)}
-        onClose={() => setAnchorEl(null)}
-        PaperProps={{
-          sx: {
-            mt: 1,
-            width: 300,
-            bgcolor: 'rgba(255, 255, 255, 0.05)',
-            backdropFilter: 'blur(10px)',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
-          },
-        }}
-      >
-        <Box sx={{ p: 2 }}>
-          <Typography variant="subtitle2" gutterBottom>
-            Status
-          </Typography>
-          <Autocomplete
-            multiple
-            size="small"
-            options={filterOptions.status}
-            value={filters.status}
-            onChange={(_, newValue) => 
-              setFilters(prev => ({ ...prev, status: newValue }))
-            }
-            renderInput={(params) => <TextField {...params} placeholder="Select status" />}
-          />
-
-          <Typography variant="subtitle2" sx={{ mt: 2 }} gutterBottom>
-            Browser
-          </Typography>
-          <Autocomplete
-            multiple
-            size="small"
-            options={filterOptions.browser}
-            value={filters.browser}
-            onChange={(_, newValue) => 
-              setFilters(prev => ({ ...prev, browser: newValue }))
-            }
-            renderInput={(params) => <TextField {...params} placeholder="Select browser" />}
-          />
-
-          <Typography variant="subtitle2" sx={{ mt: 2 }} gutterBottom>
-            Device Type
-          </Typography>
-          <Autocomplete
-            multiple
-            size="small"
-            options={filterOptions.deviceType}
-            value={filters.deviceType}
-            onChange={(_, newValue) => 
-              setFilters(prev => ({ ...prev, deviceType: newValue }))
-            }
-            renderInput={(params) => <TextField {...params} placeholder="Select device type" />}
-          />
-
-          <Typography variant="subtitle2" sx={{ mt: 2 }} gutterBottom>
-            Session Duration (minutes)
-          </Typography>
-          <Stack direction="row" spacing={1}>
-            <TextField
-              size="small"
-              type="number"
-              label="Min"
-              value={filters.duration.min}
-              onChange={(e) => setFilters(prev => ({
-                ...prev,
-                duration: { ...prev.duration, min: Number(e.target.value) }
-              }))}
-            />
-            <TextField
-              size="small"
-              type="number"
-              label="Max"
-              value={filters.duration.max}
-              onChange={(e) => setFilters(prev => ({
-                ...prev,
-                duration: { ...prev.duration, max: Number(e.target.value) }
-              }))}
-            />
-          </Stack>
-        </Box>
-      </Menu>
-    </>
-  );
 
   return (
-    <AdminPageWrapper>
-      <PageContainer
-        icon={<Visibility />}
-        title="Live Sessions"
-        onSearch={(value) => setFilters(prev => ({ ...prev, searchTerm: value }))}
-        onFilter={() => setAnchorEl(null)}
-        filterOptions={[
-          'Status',
-          'Browser',
-          'Device Type',
-          'Location',
-          'Duration',
-        ]}
-        searchPlaceholder="Search sessions..."
-      >
-        <MapView />
-        <StatisticsView />
+    <PageContainer
+      icon={<Visibility />}
+      title="Live Sessions"
+      onSearch={handleSearch}
+      onFilter={handleFilter}
+      filterOptions={filterOptions}
+      searchPlaceholder="Search sessions..."
+    >
+      {loading ? (
+        <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
+          <CircularProgress sx={{ color: 'primary.main' }} />
+        </Box>
+      ) : error ? (
+        <Alert severity="error" sx={{ mb: 3 }}>{error}</Alert>
+      ) : filteredSessions.length === 0 ? (
+        <Alert severity="info" sx={{ mb: 3 }}>No sessions found.</Alert>
+      ) : (
         <Grid container spacing={3}>
           {filteredSessions.map((session) => (
-            <Grid item xs={12} md={6} lg={4} key={session.id}>
+            <Grid item xs={12} sm={6} md={4} key={session.id}>
               <SessionCard session={session} />
             </Grid>
           ))}
         </Grid>
-      </PageContainer>
-    </AdminPageWrapper>
+      )}
+    </PageContainer>
   );
 };
 

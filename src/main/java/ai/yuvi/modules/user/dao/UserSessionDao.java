@@ -4,14 +4,17 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.sql.Timestamp;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.logging.Level;
+import java.util.UUID;
 import java.util.logging.Logger;
 
-import ai.yuvi.config.DataSourceProvider;
+import javax.sql.DataSource;
+
 import ai.yuvi.modules.user.enums.Browser;
 import ai.yuvi.modules.user.enums.DeviceType;
 import ai.yuvi.modules.user.enums.OsType;
@@ -20,191 +23,152 @@ import ai.yuvi.modules.user.model.UserSession;
 
 public class UserSessionDao {
     private static final Logger LOGGER = Logger.getLogger(UserSessionDao.class.getName());
+    private final DataSource dataSource;
 
-    public boolean create(UserSession session) {
-        String sql = """
-            INSERT INTO user_sessions (
-                id, user_id, company_id, status, started_at, last_activity_at, ended_at,
-                duration_seconds, device_type, browser, browser_version, os_type, os_version,
-                device_id, ip_address, city, country, latitude, longitude, user_agent,
-                screen_resolution, language, timezone, is_authenticated, is_secure_connection,
-                connection_type, network_speed, current_page, previous_page, page_views,
-                total_clicks, total_actions, bounce_rate
-            ) VALUES (?, ?, ?, ?::session_status_enum, ?, ?, ?, ?, ?::device_type_enum,
-                     ?::browser_enum, ?, ?::os_type_enum, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
-                     ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """;
-
-        try (Connection conn = DataSourceProvider.getDataSource().getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            
-            int paramIndex = 1;
-            stmt.setString(paramIndex++, session.getId());
-            stmt.setLong(paramIndex++, session.getUserId());
-            stmt.setLong(paramIndex++, session.getCompanyId());
-            stmt.setString(paramIndex++, session.getStatus().name());
-            stmt.setTimestamp(paramIndex++, Timestamp.from(session.getStartedAt().toInstant()));
-            stmt.setTimestamp(paramIndex++, Timestamp.from(session.getLastActivityAt().toInstant()));
-            stmt.setTimestamp(paramIndex++, session.getEndedAt() != null ? 
-                Timestamp.from(session.getEndedAt().toInstant()) : null);
-            stmt.setInt(paramIndex++, session.getDurationSeconds());
-            stmt.setString(paramIndex++, session.getDeviceType().name());
-            stmt.setString(paramIndex++, session.getBrowser().name());
-            stmt.setString(paramIndex++, session.getBrowserVersion());
-            stmt.setString(paramIndex++, session.getOsType().name());
-            stmt.setString(paramIndex++, session.getOsVersion());
-            stmt.setString(paramIndex++, session.getDeviceId());
-            stmt.setObject(paramIndex++, session.getIpAddress().getHostAddress());
-            stmt.setString(paramIndex++, session.getCity());
-            stmt.setString(paramIndex++, session.getCountry());
-            stmt.setBigDecimal(paramIndex++, session.getLatitude());
-            stmt.setBigDecimal(paramIndex++, session.getLongitude());
-            stmt.setString(paramIndex++, session.getUserAgent());
-            stmt.setString(paramIndex++, session.getScreenResolution());
-            stmt.setString(paramIndex++, session.getLanguage());
-            stmt.setString(paramIndex++, session.getTimezone());
-            stmt.setBoolean(paramIndex++, session.getIsAuthenticated());
-            stmt.setBoolean(paramIndex++, session.getIsSecureConnection());
-            stmt.setString(paramIndex++, session.getConnectionType());
-            stmt.setString(paramIndex++, session.getNetworkSpeed());
-            stmt.setString(paramIndex++, session.getCurrentPage());
-            stmt.setString(paramIndex++, session.getPreviousPage());
-            stmt.setInt(paramIndex++, session.getPageViews());
-            stmt.setInt(paramIndex++, session.getTotalClicks());
-            stmt.setInt(paramIndex++, session.getTotalActions());
-            stmt.setBigDecimal(paramIndex++, session.getBounceRate());
-
-            return stmt.executeUpdate() > 0;
-        } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error creating user session", e);
-            return false;
-        }
+    public UserSessionDao(DataSource dataSource) {
+        this.dataSource = dataSource;
     }
 
-    public Optional<UserSession> findById(String sessionId) {
-        String sql = "SELECT * FROM user_sessions WHERE id = ?";
-        try (Connection conn = DataSourceProvider.getDataSource().getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            
-            stmt.setString(1, sessionId);
-            try (ResultSet rs = stmt.executeQuery()) {
+    public Optional<UserSession> findBySessionId(UUID sessionId) {
+        String sql = "SELECT * FROM user_sessions WHERE session_id = ?";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setObject(1, sessionId);
+            try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     return Optional.of(mapResultSetToUserSession(rs));
                 }
             }
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error finding session by ID", e);
+            LOGGER.severe("Error finding session by ID: " + e.getMessage());
         }
         return Optional.empty();
     }
 
     public List<UserSession> findByUserId(Long userId) {
-        String sql = "SELECT * FROM user_sessions WHERE user_id = ? ORDER BY started_at DESC";
         List<UserSession> sessions = new ArrayList<>();
-        try (Connection conn = DataSourceProvider.getDataSource().getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            
-            stmt.setLong(1, userId);
-            try (ResultSet rs = stmt.executeQuery()) {
+        String sql = "SELECT * FROM user_sessions WHERE user_id = ? ORDER BY created_at DESC";
+        
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setLong(1, userId);
+            try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     sessions.add(mapResultSetToUserSession(rs));
                 }
             }
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error finding sessions by user ID", e);
+            LOGGER.severe("Error finding sessions by user ID: " + e.getMessage());
         }
         return sessions;
     }
 
-    public boolean update(UserSession session) {
+    public boolean create(UserSession session) {
+        String sql = """
+            INSERT INTO user_sessions (
+                session_id, user_id, ip_address, user_agent, browser,
+                browser_version, os, os_version, device_type, authenticated,
+                secure_connection, status, last_activity_at, expires_at,
+                created_at, updated_at
+            ) VALUES (?, ?, ?, ?, ?::browser_type, ?, ?::os_type, ?, ?::device_type, ?, ?, ?::session_status, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+        """;
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            int paramIndex = 1;
+            ps.setObject(paramIndex++, session.getSessionId());
+            ps.setLong(paramIndex++, session.getUserId());
+            ps.setString(paramIndex++, session.getIpAddress());
+            ps.setString(paramIndex++, session.getUserAgent());
+            ps.setString(paramIndex++, session.getBrowser().name());
+            ps.setString(paramIndex++, session.getBrowserVersion());
+            ps.setString(paramIndex++, session.getOs().name());
+            ps.setString(paramIndex++, session.getOsVersion());
+            ps.setString(paramIndex++, session.getDeviceType().name());
+            ps.setBoolean(paramIndex++, session.isAuthenticated());
+            ps.setBoolean(paramIndex++, session.isSecureConnection());
+            ps.setString(paramIndex++, session.getStatus().name());
+            
+            if (session.getLastActivityAt() != null) {
+                ps.setTimestamp(paramIndex++, Timestamp.from(session.getLastActivityAt().toInstant()));
+            } else {
+                ps.setNull(paramIndex++, Types.TIMESTAMP);
+            }
+            
+            if (session.getExpiresAt() != null) {
+                ps.setTimestamp(paramIndex++, Timestamp.from(session.getExpiresAt().toInstant()));
+            } else {
+                ps.setNull(paramIndex++, Types.TIMESTAMP);
+            }
+
+            int affectedRows = ps.executeUpdate();
+            if (affectedRows > 0) {
+                try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
+                    if (generatedKeys.next()) {
+                        session.setId(generatedKeys.getLong(1));
+                        return true;
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.severe("Error creating session: " + e.getMessage());
+        }
+        return false;
+    }
+
+    public boolean invalidateSession(Long userId, UUID sessionId) {
         String sql = """
             UPDATE user_sessions SET 
-                status = ?::session_status_enum,
-                last_activity_at = ?,
-                ended_at = ?,
-                duration_seconds = ?,
-                current_page = ?,
-                previous_page = ?,
-                page_views = ?,
-                total_clicks = ?,
-                total_actions = ?,
-                bounce_rate = ?,
+                status = ?::session_status,
                 updated_at = CURRENT_TIMESTAMP
-            WHERE id = ?
+            WHERE user_id = ? AND session_id = ?
         """;
-
-        try (Connection conn = DataSourceProvider.getDataSource().getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            
-            int paramIndex = 1;
-            stmt.setString(paramIndex++, session.getStatus().name());
-            stmt.setTimestamp(paramIndex++, Timestamp.from(session.getLastActivityAt().toInstant()));
-            stmt.setTimestamp(paramIndex++, session.getEndedAt() != null ? 
-                Timestamp.from(session.getEndedAt().toInstant()) : null);
-            stmt.setInt(paramIndex++, session.getDurationSeconds());
-            stmt.setString(paramIndex++, session.getCurrentPage());
-            stmt.setString(paramIndex++, session.getPreviousPage());
-            stmt.setInt(paramIndex++, session.getPageViews());
-            stmt.setInt(paramIndex++, session.getTotalClicks());
-            stmt.setInt(paramIndex++, session.getTotalActions());
-            stmt.setBigDecimal(paramIndex++, session.getBounceRate());
-            stmt.setString(paramIndex++, session.getId());
-
-            return stmt.executeUpdate() > 0;
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, SessionStatus.INVALIDATED.name());
+            ps.setLong(2, userId);
+            ps.setObject(3, sessionId);
+            return ps.executeUpdate() > 0;
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error updating user session", e);
+            LOGGER.severe("Error invalidating session: " + e.getMessage());
             return false;
         }
     }
 
     private UserSession mapResultSetToUserSession(ResultSet rs) throws SQLException {
         UserSession session = new UserSession();
-        session.setId(rs.getString("id"));
+        session.setId(rs.getLong("id"));
+        session.setSessionId((UUID) rs.getObject("session_id"));
         session.setUserId(rs.getLong("user_id"));
-        session.setCompanyId(rs.getLong("company_id"));
-        session.setStatus(SessionStatus.valueOf(rs.getString("status")));
-        session.setStartedAt(rs.getTimestamp("started_at").toInstant().atZone(java.time.ZoneId.systemDefault()));
-        session.setLastActivityAt(rs.getTimestamp("last_activity_at").toInstant().atZone(java.time.ZoneId.systemDefault()));
-        
-        Timestamp endedAt = rs.getTimestamp("ended_at");
-        if (endedAt != null) {
-            session.setEndedAt(endedAt.toInstant().atZone(java.time.ZoneId.systemDefault()));
-        }
-        
-        session.setDurationSeconds(rs.getInt("duration_seconds"));
-        session.setDeviceType(DeviceType.valueOf(rs.getString("device_type")));
-        session.setBrowser(Browser.valueOf(rs.getString("browser")));
-        session.setBrowserVersion(rs.getString("browser_version"));
-        session.setOsType(OsType.valueOf(rs.getString("os_type")));
-        session.setOsVersion(rs.getString("os_version"));
-        session.setDeviceId(rs.getString("device_id"));
-        
-        try {
-            session.setIpAddress(java.net.InetAddress.getByName(rs.getString("ip_address")));
-        } catch (Exception e) {
-            LOGGER.log(Level.WARNING, "Error parsing IP address", e);
-        }
-        
-        session.setCity(rs.getString("city"));
-        session.setCountry(rs.getString("country"));
-        session.setLatitude(rs.getBigDecimal("latitude"));
-        session.setLongitude(rs.getBigDecimal("longitude"));
+        session.setIpAddress(rs.getString("ip_address"));
         session.setUserAgent(rs.getString("user_agent"));
-        session.setScreenResolution(rs.getString("screen_resolution"));
-        session.setLanguage(rs.getString("language"));
-        session.setTimezone(rs.getString("timezone"));
-        session.setIsAuthenticated(rs.getBoolean("is_authenticated"));
-        session.setIsSecureConnection(rs.getBoolean("is_secure_connection"));
-        session.setConnectionType(rs.getString("connection_type"));
-        session.setNetworkSpeed(rs.getString("network_speed"));
-        session.setCurrentPage(rs.getString("current_page"));
-        session.setPreviousPage(rs.getString("previous_page"));
-        session.setPageViews(rs.getInt("page_views"));
-        session.setTotalClicks(rs.getInt("total_clicks"));
-        session.setTotalActions(rs.getInt("total_actions"));
-        session.setBounceRate(rs.getBigDecimal("bounce_rate"));
-        session.setCreatedAt(rs.getTimestamp("created_at").toInstant().atZone(java.time.ZoneId.systemDefault()));
-        session.setUpdatedAt(rs.getTimestamp("updated_at").toInstant().atZone(java.time.ZoneId.systemDefault()));
+        session.setBrowser(Browser.fromString(rs.getString("browser")));
+        session.setBrowserVersion(rs.getString("browser_version"));
+        session.setOs(OsType.fromString(rs.getString("os")));
+        session.setOsVersion(rs.getString("os_version"));
+        session.setDeviceType(DeviceType.fromString(rs.getString("device_type")));
+        session.setAuthenticated(rs.getBoolean("authenticated"));
+        session.setSecureConnection(rs.getBoolean("secure_connection"));
+        session.setStatus(SessionStatus.fromString(rs.getString("status")));
+        
+        Timestamp lastActivityAt = rs.getTimestamp("last_activity_at");
+        if (lastActivityAt != null) {
+            session.setLastActivityAt(lastActivityAt.toInstant().atZone(java.time.ZoneId.systemDefault()));
+        }
+        
+        Timestamp expiresAt = rs.getTimestamp("expires_at");
+        if (expiresAt != null) {
+            session.setExpiresAt(expiresAt.toInstant().atZone(java.time.ZoneId.systemDefault()));
+        }
+        
+        Timestamp createdAt = rs.getTimestamp("created_at");
+        if (createdAt != null) {
+            session.setCreatedAt(createdAt.toInstant().atZone(java.time.ZoneId.systemDefault()));
+        }
+        
+        Timestamp updatedAt = rs.getTimestamp("updated_at");
+        if (updatedAt != null) {
+            session.setUpdatedAt(updatedAt.toInstant().atZone(java.time.ZoneId.systemDefault()));
+        }
         
         return session;
     }
