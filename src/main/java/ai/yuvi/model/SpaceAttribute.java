@@ -2,10 +2,11 @@ package ai.yuvi.model;
 
 import java.time.ZonedDateTime;
 
-public class Team {
+public class SpaceAttribute {
     private Long id;
-    private Long companyId;
-    private String teamName;
+    private Long spaceId;
+    private String key;
+    private String value;
     private ZonedDateTime createdAt;
     private ZonedDateTime updatedAt;
 
@@ -17,18 +18,25 @@ public class Team {
         this.id = id;
     }
 
-    public Long getCompanyId() {
-        return companyId;
+    public Long getSpaceId() {
+        return spaceId;
     }
-    public void setCompanyId(Long companyId) {
-        this.companyId = companyId;
+    public void setSpaceId(Long spaceId) {
+        this.spaceId = spaceId;
     }
 
-    public String getTeamName() {
-        return teamName;
+    public String getKey() {
+        return key;
     }
-    public void setTeamName(String teamName) {
-        this.teamName = teamName;
+    public void setKey(String key) {
+        this.key = key;
+    }
+
+    public String getValue() {
+        return value;
+    }
+    public void setValue(String value) {
+        this.value = value;
     }
 
     public ZonedDateTime getCreatedAt() {

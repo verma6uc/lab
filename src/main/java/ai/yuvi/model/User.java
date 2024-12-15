@@ -2,16 +2,17 @@ package ai.yuvi.model;
 
 import java.time.ZonedDateTime;
 import java.util.List;
-import com.fasterxml.jackson.databind.JsonNode;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.JsonNode;
 
 public class User {
-    private Long userId;
-    private String id;
+    private Long id; // Changed from userId to match database id column
+    private String externalId; // Changed from id to better represent the unique string identifier
     private Long companyId;
     private String name;
     private String email;
-    @JsonIgnore // Don't serialize password in JSON responses
+    @JsonIgnore
     private String password;
     private UserRole role;
     private UserStatus status;
@@ -21,17 +22,17 @@ public class User {
     private String department;
     private String phone;
     private String location;
-    private String bio;
+    private String bio; // Added missing bio field
     private List<String> skills;
     private JsonNode preferences;
     private JsonNode socialLinks;
 
     // Getters and Setters
-    public Long getUserId() { return userId; }
-    public void setUserId(Long userId) { this.userId = userId; }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    public String getId() { return id; }
-    public void setId(String id) { this.id = id; }
+    public String getExternalId() { return externalId; }
+    public void setExternalId(String externalId) { this.externalId = externalId; }
 
     public Long getCompanyId() { return companyId; }
     public void setCompanyId(Long companyId) { this.companyId = companyId; }
@@ -81,4 +82,4 @@ public class User {
 
     public JsonNode getSocialLinks() { return socialLinks; }
     public void setSocialLinks(JsonNode socialLinks) { this.socialLinks = socialLinks; }
-} 
+}

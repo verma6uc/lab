@@ -4,16 +4,28 @@ import java.time.ZonedDateTime;
 
 public class BrandEmbedding {
     private Long companyId;
-    private double[] embeddingVector;
+    private Object embeddingVector; // Using Object type since 'vector' is a custom PostgreSQL type
     private ZonedDateTime updatedAt;
 
     // Getters and Setters
-    public Long getCompanyId() { return companyId; }
-    public void setCompanyId(Long companyId) { this.companyId = companyId; }
+    public Long getCompanyId() {
+        return companyId;
+    }
+    public void setCompanyId(Long companyId) {
+        this.companyId = companyId;
+    }
 
-    public double[] getEmbeddingVector() { return embeddingVector; }
-    public void setEmbeddingVector(double[] embeddingVector) { this.embeddingVector = embeddingVector; }
+    public Object getEmbeddingVector() {
+        return embeddingVector;
+    }
+    public void setEmbeddingVector(Object embeddingVector) {
+        this.embeddingVector = embeddingVector;
+    }
 
-    public ZonedDateTime getUpdatedAt() { return updatedAt; }
-    public void setUpdatedAt(ZonedDateTime updatedAt) { this.updatedAt = updatedAt; }
+    public ZonedDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+    public void setUpdatedAt(ZonedDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
 }

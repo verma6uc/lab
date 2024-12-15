@@ -1,35 +1,41 @@
 package ai.yuvi.model;
+
 public class CompanyBrand {
-    private long companyId;
+    private Long companyId; // Changed to Long to match database type
     private String primaryColor;
     private String secondaryColor;
     private String fontFamily;
     private String logoUrl;
 
-    public long getCompanyId() {
+    // Getters and Setters
+    public Long getCompanyId() {
         return companyId;
     }
-    public void setCompanyId(long companyId) {
+    public void setCompanyId(Long companyId) {
         this.companyId = companyId;
     }
+
     public String getPrimaryColor() {
         return primaryColor;
     }
     public void setPrimaryColor(String primaryColor) {
         this.primaryColor = primaryColor;
     }
+
     public String getSecondaryColor() {
         return secondaryColor;
     }
     public void setSecondaryColor(String secondaryColor) {
         this.secondaryColor = secondaryColor;
     }
+
     public String getFontFamily() {
         return fontFamily;
     }
     public void setFontFamily(String fontFamily) {
         this.fontFamily = fontFamily;
     }
+
     public String getLogoUrl() {
         return logoUrl;
     }

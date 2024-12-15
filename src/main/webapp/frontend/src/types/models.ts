@@ -1,3 +1,53 @@
+// Database aligned enums
+export enum UserRole {
+    SUPERADMIN = 'SUPERADMIN',
+    CREATOR = 'CREATOR',
+    USER = 'USER'
+}
+
+export enum UserStatus {
+    ACTIVE = 'ACTIVE',
+    INACTIVE = 'INACTIVE',
+    PENDING = 'PENDING'
+}
+
+export enum BrowserType {
+    Chrome = 'Chrome',
+    Firefox = 'Firefox',
+    Safari = 'Safari',
+    Edge = 'Edge',
+    Other = 'Other'
+}
+
+export enum DeviceType {
+    DESKTOP = 'desktop',
+    MOBILE = 'mobile',
+    TABLET = 'tablet'
+}
+
+export enum OSType {
+    Windows = 'Windows',
+    MacOS = 'MacOS',
+    Linux = 'Linux',
+    iOS = 'iOS',
+    Android = 'Android',
+    Other = 'Other'
+}
+
+export enum SessionStatus {
+    ACTIVE = 'active',
+    IDLE = 'idle',
+    DISCONNECTED = 'disconnected'
+}
+
+export enum SpaceType {
+    DEPARTMENT = 'DEPARTMENT',
+    FACILITY = 'FACILITY',
+    TEAM = 'TEAM',
+    PROJECT = 'PROJECT',
+    DIVISION = 'DIVISION'
+}
+
 export enum Industry {
     TECHNOLOGY = 'TECHNOLOGY',
     HEALTHCARE = 'HEALTHCARE',
@@ -21,43 +71,154 @@ export enum Industry {
     OTHER = 'OTHER'
 }
 
+// Database aligned interfaces
 export interface Company {
     id: number;
     name: string;
     description?: string;
-    industry?: string;
-    type?: string;
-    size?: number;
-    location?: string;
+    industry: Industry;
     website?: string;
     email?: string;
     phone?: string;
+    location?: string;
+    size?: number;
     linkedinUrl?: string;
     twitterUrl?: string;
     githubUrl?: string;
     logoUrl?: string;
-    team?: TeamMember[];
-    competitors?: Competitor[];
-    research?: ResearchItem[];
-    uiArchetypes?: UIArchetype[];
-    users?: CompanyUser[];
-    products?: Array<{
-        id: string;
-        name: string;
-        description: string;
-        type: string;
-        status: string;
-    }>;
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 export interface Product {
-    productId: number;
-    productName: string;
-    productDescription?: string;
+    id: number;
+    name: string;
+    description?: string;
     type?: string;
     status?: string;
     companyId: number;
+    createdAt: Date;
+    updatedAt: Date;
 }
+
+export interface CompanyScreenshot {
+    id: number;
+    companyId: number;
+    url: string;
+    description?: string;
+    type?: string;
+    createdAt: Date;
+    updatedAt: Date;
+}
+
+export interface UIArchetype {
+    id: number;
+    companyId: number;
+    name: string;
+    description?: string;
+    createdAt: Date;
+    updatedAt: Date;
+}
+
+export interface Session {
+    id: string;
+    userId: number;
+    companyId: number;
+    status: SessionStatus;
+    startTime: Date;
+    endTime?: Date;
+    lastActivityTime: Date;
+    deviceType: DeviceType;
+    browser: BrowserType;
+    browserVersion: string;
+    osType: OSType;
+    osVersion: string;
+    deviceId: string;
+    ipAddress: string;
+    userAgent: string;
+    location?: {
+        city?: string;
+        country?: string;
+        latitude?: number;
+        longitude?: number;
+    };
+    createdAt: Date;
+    updatedAt: Date;
+}
+
+export interface AuditLog {
+    auditId: number;
+    userId: number;
+    action: string;
+    entityType: string;
+    entityId: number;
+    timestamp: Date;
+    changes: AuditLogChange[];
+}
+
+export interface AuditLogChange {
+    auditChangeId: number;
+    auditId: number;
+    fieldName: string;
+    oldValue: string;
+    newValue: string;
+}
+
+export interface User {
+    id: number;
+    email: string;
+    firstName: string;
+    lastName: string;
+    role: UserRole;
+    status: UserStatus;
+    companyId: number;
+    lastLoginAt?: Date;
+    createdAt: Date;
+    updatedAt: Date;
+}
+
+export interface Space {
+    id: number;
+    name: string;
+    description?: string;
+    type: SpaceType;
+    companyId: number;
+    parentSpaceId?: number;
+    createdAt: Date;
+    updatedAt: Date;
+}
+
+// Helper type for API responses
+export interface ApiResponse<T> {
+    data: T;
+    message?: string;
+    error?: string;
+    timestamp: Date;
+}
+
+// Vector types for AI/ML features
+export interface VectorData {
+    id: number;
+    vector: number[];
+    metadata?: Record<string, any>;
+    createdAt: Date;
+    updatedAt: Date;
+}
+
+export interface BrandEmbedding extends VectorData {
+    companyId: number;
+    type: string;
+    source: string;
+}
+
+// Common types used across interfaces
+export type CompanyType = "startup" | "enterprise" | "smb" | "agency";
+export type CompanyStatus = "active" | "inactive" | "pending" | "archived";
+export type ProductStatus = "draft" | "active" | "deprecated" | "archived";
+export type TeamType = "engineering" | "product" | "design" | "marketing" | "sales";
+export type ResearchType = "market analysis" | "user research" | "competitive analysis";
+export type CompetitorType = "direct" | "indirect" | "potential";
+export type PricingModel = "subscription" | "one-time" | "freemium" | "custom";
 
 export interface TeamMember {
     id: number;
@@ -103,13 +264,6 @@ export interface Brand {
     brandValues?: string;
 }
 
-export interface UIArchetype {
-    archetypeId: number;
-    archetypeName?: string;
-    description?: string;
-    // Add other fields as necessary
-}
-
 export interface CompanyUser {
     id: number;
     name: string;
@@ -129,75 +283,4 @@ export interface CompanyDetails {
     users: CompanyUser[];
     brand: Brand;
     uiArchetypes: UIArchetype[];
-}
-
-// Common types used across interfaces
-export type CompanyType = "startup" | "enterprise" | "smb" | "agency";
-export type CompanyStatus = "active" | "inactive" | "pending" | "archived";
-export type ProductStatus = "draft" | "active" | "deprecated" | "archived";
-export type TeamType = "engineering" | "product" | "design" | "marketing" | "sales";
-export type ResearchType = "market analysis" | "user research" | "competitive analysis";
-export type CompetitorType = "direct" | "indirect" | "potential";
-export type PricingModel = "subscription" | "one-time" | "freemium" | "custom";
-export type UserRole = "admin" | "editor" | "viewer";
-
-// Helper type for API responses
-export interface ApiResponse<T> {
-    data: T;
-    message?: string;
-    error?: string;
-}
-
-export interface Session {
-  sessionId: string;
-  userId: number;
-  companyId: number;
-  
-  // Session Status
-  status: 'active' | 'idle' | 'disconnected';
-  startedAt: string;
-  lastActivityAt: string;
-  endedAt?: string;
-  durationSeconds: number;
-  
-  // Device Information
-  deviceType: 'desktop' | 'mobile' | 'tablet';
-  browser: string;
-  browserVersion: string;
-  osType: string;
-  osVersion: string;
-  deviceId: string;
-  
-  // Location Information
-  ipAddress: string;
-  city: string;
-  country: string;
-  latitude: number;
-  longitude: number;
-  
-  // Technical Details
-  userAgent: string;
-  screenResolution: string;
-  language: string;
-  timezone: string;
-  
-  // Security & Performance
-  isAuthenticated: boolean;
-  isSecureConnection: boolean;
-  connectionType: string;
-  networkSpeed: string;
-  
-  // Page Navigation
-  currentPage: string;
-  previousPage: string;
-  pageViews: number;
-  
-  // Analytics
-  totalClicks: number;
-  totalActions: number;
-  bounceRate: number;
-  
-  // System Columns
-  createdAt: string;
-  updatedAt: string;
 } 

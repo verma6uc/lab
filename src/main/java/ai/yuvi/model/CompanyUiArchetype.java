@@ -1,28 +1,33 @@
 package ai.yuvi.model;
+
 public class CompanyUiArchetype {
-    private long archetypeId;
-    private long companyId;
+    private Long id; // Changed from archetypeId to match database column
+    private Long companyId;
     private String archetypeName;
     private String description;
 
-    public long getArchetypeId() {
-        return archetypeId;
+    // Getters and Setters
+    public Long getId() {
+        return id;
     }
-    public void setArchetypeId(long archetypeId) {
-        this.archetypeId = archetypeId;
+    public void setId(Long id) {
+        this.id = id;
     }
-    public long getCompanyId() {
+
+    public Long getCompanyId() {
         return companyId;
     }
-    public void setCompanyId(long companyId) {
+    public void setCompanyId(Long companyId) {
         this.companyId = companyId;
     }
+
     public String getArchetypeName() {
         return archetypeName;
     }
     public void setArchetypeName(String archetypeName) {
         this.archetypeName = archetypeName;
     }
+
     public String getDescription() {
         return description;
     }
