@@ -43,6 +43,8 @@ const MetricCard: React.FC<MetricCardProps> = ({
         bgcolor: 'rgba(255, 255, 255, 0.05)',
         border: '1px solid rgba(255, 255, 255, 0.1)',
         height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
         transition: 'all 0.2s',
         '&:hover': {
           bgcolor: 'rgba(255, 255, 255, 0.08)',
@@ -63,6 +65,7 @@ const MetricCard: React.FC<MetricCardProps> = ({
           color: 'white',
           fontSize: '1.5rem',
           fontWeight: 600,
+          mt: 'auto',
         }}
       >
         {value}
@@ -129,6 +132,9 @@ const CompanyMetrics: React.FC<CompanyMetricsProps> = ({ company }) => {
       bgcolor: 'rgba(10, 25, 41, 0.7)',
       borderRadius: 2,
       border: '1px solid rgba(0, 163, 255, 0.1)',
+      height: '100%',
+      display: 'flex',
+      flexDirection: 'column',
     }}>
       <Box sx={{ mb: 3 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
@@ -142,9 +148,9 @@ const CompanyMetrics: React.FC<CompanyMetricsProps> = ({ company }) => {
         </Typography>
       </Box>
 
-      <Grid container spacing={2}>
+      <Grid container spacing={2} sx={{ flex: 1 }}>
         {metrics.map((metric, index) => (
-          <Grid item xs={12} sm={6} md={4} key={index}>
+          <Grid item xs={12} sm={6} key={index}>
             <MetricCard {...metric} />
           </Grid>
         ))}

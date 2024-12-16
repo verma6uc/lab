@@ -1,12 +1,36 @@
-export type UserRole = 'ADMIN' | 'CREATOR' | 'USER';
-export type UserStatus = 'active' | 'inactive';
+export enum UserRole {
+  ADMIN = 'ADMIN',
+  USER = 'USER',
+  MANAGER = 'MANAGER',
+  VIEWER = 'VIEWER',
+  CREATOR = 'CREATOR'
+}
+
+export enum UserStatus {
+  ACTIVE = 'ACTIVE',
+  INACTIVE = 'INACTIVE',
+  PENDING = 'PENDING',
+  BLOCKED = 'BLOCKED'
+}
 
 export interface CompanyUser {
   id: number;
   name: string;
   email: string;
-  avatar_url?: string;
   role: UserRole;
   status: UserStatus;
-  last_active?: string;
+  designation: string;
+  department: string;
+  lastActive: string;
+  avatar_url?: string;
+}
+
+export interface UserCardProps {
+  user: CompanyUser;
+  onEdit: (id: number) => void;
+  onDelete: (id: number) => void;
+}
+
+export interface RoleSummaryProps {
+  users: CompanyUser[];
 }

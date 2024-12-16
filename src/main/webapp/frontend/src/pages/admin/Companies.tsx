@@ -9,7 +9,6 @@ import StyledButton from '../../components/shared/StyledButton';
 import { Add as AddIcon } from '@mui/icons-material';
 import { Company } from '../../types/company';
 
-// Mock data based on database schema
 const mockCompanies: Company[] = [
   {
     id: 1,
@@ -299,12 +298,26 @@ const Companies: React.FC = () => {
         activeFilters={filters}
       />
 
-      <Grid container spacing={3}>
-        {filteredCompanies.map(company => (
-          <Grid item xs={12} md={6} lg={4} key={company.id}>
+      <Box sx={{ mt: 3 }}>
+        <Box 
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: {
+              xs: '1fr',
+              md: 'repeat(2, 1fr)',
+              lg: 'repeat(3, 1fr)',
+            },
+            gap: 3,
+          }}
+        >
+          {filteredCompanies.map(company => (
             <Box 
+              key={company.id}
               onClick={() => handleViewDetails(company.id)}
-              sx={{ cursor: 'pointer' }}
+              sx={{ 
+                height: '100%',
+                cursor: 'pointer',
+              }}
             >
               <CompanyCard
                 company={company}
@@ -313,9 +326,9 @@ const Companies: React.FC = () => {
                 onStatusChange={handleStatusChange}
               />
             </Box>
-          </Grid>
-        ))}
-      </Grid>
+          ))}
+        </Box>
+      </Box>
 
       {filteredCompanies.length === 0 && (
         <Box 

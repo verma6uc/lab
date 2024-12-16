@@ -36,6 +36,9 @@ const CompanyOverview: React.FC<CompanyOverviewProps> = ({ company, onEdit }) =>
       bgcolor: 'rgba(10, 25, 41, 0.7)',
       borderRadius: 2,
       border: '1px solid rgba(0, 163, 255, 0.1)',
+      height: '100%',
+      display: 'flex',
+      flexDirection: 'column',
     }}>
       {/* Header with Actions */}
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 3 }}>
@@ -55,7 +58,7 @@ const CompanyOverview: React.FC<CompanyOverviewProps> = ({ company, onEdit }) =>
             <Typography variant="h4" sx={{ color: 'white', mb: 1, fontWeight: 600 }}>
               {company.name}
             </Typography>
-            <Stack direction="row" spacing={1}>
+            <Stack direction="row" spacing={1} flexWrap="wrap" gap={1}>
               <Chip 
                 label={company.industry.charAt(0) + company.industry.slice(1).toLowerCase().replace('_', ' ')}
                 size="small"
@@ -123,44 +126,46 @@ const CompanyOverview: React.FC<CompanyOverviewProps> = ({ company, onEdit }) =>
       </Box>
 
       {/* Contact Information */}
-      {contactInfo.length > 0 && (
-        <Box>
-          <Typography variant="h6" sx={{ color: 'white', mb: 2, fontWeight: 600 }}>
-            Contact Information
-          </Typography>
-          <Stack spacing={2}>
-            {contactInfo.map((info, index) => (
-              <Box 
-                key={index}
-                sx={{ 
-                  display: 'flex',
-                  alignItems: 'flex-start',
-                  gap: 1.5,
-                }}
-              >
-                <Box sx={{ 
-                  p: 1, 
-                  borderRadius: 1, 
-                  bgcolor: 'rgba(0, 163, 255, 0.1)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
-                }}>
-                  {React.cloneElement(info.icon as React.ReactElement, { sx: { color: '#00A3FF' } })}
+      <Box sx={{ flex: 1 }}>
+        {contactInfo.length > 0 && (
+          <Box>
+            <Typography variant="h6" sx={{ color: 'white', mb: 2, fontWeight: 600 }}>
+              Contact Information
+            </Typography>
+            <Stack spacing={2}>
+              {contactInfo.map((info, index) => (
+                <Box 
+                  key={index}
+                  sx={{ 
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    gap: 1.5,
+                  }}
+                >
+                  <Box sx={{ 
+                    p: 1, 
+                    borderRadius: 1, 
+                    bgcolor: 'rgba(0, 163, 255, 0.1)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}>
+                    {React.cloneElement(info.icon as React.ReactElement, { sx: { color: '#00A3FF' } })}
+                  </Box>
+                  <Box>
+                    <Typography sx={{ color: 'rgba(255, 255, 255, 0.5)', fontSize: '0.75rem' }}>
+                      {info.label}
+                    </Typography>
+                    <Typography sx={{ color: 'white' }}>
+                      {info.value}
+                    </Typography>
+                  </Box>
                 </Box>
-                <Box>
-                  <Typography sx={{ color: 'rgba(255, 255, 255, 0.5)', fontSize: '0.75rem' }}>
-                    {info.label}
-                  </Typography>
-                  <Typography sx={{ color: 'white' }}>
-                    {info.value}
-                  </Typography>
-                </Box>
-              </Box>
-            ))}
-          </Stack>
-        </Box>
-      )}
+              ))}
+            </Stack>
+          </Box>
+        )}
+      </Box>
 
       {/* Founded Date */}
       <Box sx={{ mt: 3, pt: 3, borderTop: '1px solid rgba(255, 255, 255, 0.1)' }}>

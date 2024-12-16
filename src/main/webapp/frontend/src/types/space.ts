@@ -1,26 +1,35 @@
-export type SpaceType = 'facility' | 'department' | 'team' | 'division' | 'unit';
+export enum SpaceType {
+  DEPARTMENT = 'DEPARTMENT',
+  TEAM = 'TEAM',
+  PROJECT = 'PROJECT',
+  PERSONAL = 'PERSONAL',
+  FACILITY = 'FACILITY'
+}
+
+export interface SpaceAttributes {
+  capacity?: number;
+  location?: string;
+  manager?: string;
+  budget?: number;
+  startDate?: string;
+  endDate?: string;
+  member_count?: number;
+}
 
 export interface Space {
   id: number;
   name: string;
   type: SpaceType;
-  description?: string;
-  parent_id?: number;
-  attributes?: {
-    location?: string;
-    capacity?: number;
-    manager?: string;
-    [key: string]: any;
-  };
-  status: 'active' | 'inactive';
+  status: string;
   created_at: string;
-  updated_at?: string;
+  description?: string;
+  attributes?: SpaceAttributes;
+  parent?: number;
+  children?: Space[];
 }
 
-export interface SpaceAttribute {
-  id: number;
-  space_id: number;
-  key: string;
-  value: string;
-  created_at: string;
+export interface SpaceNodeProps {
+  space: Space;
+  onEdit: (id: number) => void;
+  onDelete: (id: number) => void;
 }

@@ -1,279 +1,233 @@
 import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Grid, Typography, Box, Divider } from '@mui/material';
-import PageContainer from '../../components/shared/PageContainer';
+import { Box, Grid } from '@mui/material';
 import CompanyOverview from '../../components/admin/companies/details/CompanyOverview';
 import CompanyMetrics from '../../components/admin/companies/details/CompanyMetrics';
-import BrandAttributes from '../../components/admin/companies/details/BrandAttributes';
 import CompanyApplications from '../../components/admin/companies/details/CompanyApplications';
-import CompanyProducts from '../../components/admin/companies/details/CompanyProducts';
-import CompanyUsers from '../../components/admin/companies/details/CompanyUsers';
 import CompanySpaces from '../../components/admin/companies/details/CompanySpaces';
-import CompanyInsights from '../../components/admin/companies/details/CompanyInsights';
-import CompanyEditModal from '../../components/admin/companies/CompanyEditModal';
+import CompanyUsers from '../../components/admin/companies/details/CompanyUsers';
 import { Company } from '../../types/company';
-import { CompanyUser } from '../../types/user';
-
-// Mock data for testing
-const mockCompany: Company = {
-  id: 1,
-  name: 'TechCorp',
-  industry: 'TECHNOLOGY',
-  type: 'Enterprise',
-  size: 500,
-  bio: 'Leading technology solutions provider specializing in enterprise software.',
-  description: 'Detailed description of the company and its mission...',
-  website: 'https://techcorp.com',
-  linkedin_url: 'https://linkedin.com/company/techcorp',
-  twitter_url: 'https://twitter.com/techcorp',
-  github_url: 'https://github.com/techcorp',
-  contact_email: 'contact@techcorp.com',
-  contact_phone: '+1 (555) 123-4567',
-  contact_address: '123 Tech Street, San Francisco, CA',
-  logo_url: '',
-  status: 'active',
-  branding: {
-    primary_color: '#00A3FF',
-    secondary_color: '#2ecc71',
-    font_family: 'Inter',
-  },
-  products: [
-    { id: 1, name: 'TechCRM', description: 'Enterprise CRM Solution' },
-    { id: 2, name: 'TechAnalytics', description: 'Business Intelligence Platform' },
-  ],
-  applications: [
-    {
-      id: 1,
-      name: 'Sales Dashboard',
-      description: 'Real-time sales analytics and reporting dashboard',
-      stage: 'development',
-      status: 'active',
-      pending_approval: true,
-      feedback_required: false,
-      owner: {
-        id: 1,
-        name: 'John Doe',
-        role: 'Product Owner'
-      },
-      last_updated: '2024-01-15T10:30:00Z',
-      estimated_completion: '2024-02-15T00:00:00Z',
-      created_at: '2024-01-01T00:00:00Z'
-    },
-    {
-      id: 2,
-      name: 'Customer Portal',
-      description: 'Self-service portal for customer account management',
-      stage: 'visual_prd',
-      status: 'active',
-      pending_approval: false,
-      feedback_required: true,
-      owner: {
-        id: 2,
-        name: 'Jane Smith',
-        role: 'Project Manager'
-      },
-      last_updated: '2024-01-14T15:45:00Z',
-      estimated_completion: '2024-03-01T00:00:00Z',
-      created_at: '2024-01-05T00:00:00Z'
-    },
-    {
-      id: 3,
-      name: 'Mobile App',
-      description: 'Native mobile application for field sales team',
-      stage: 'blueprint',
-      status: 'active',
-      pending_approval: false,
-      feedback_required: false,
-      owner: {
-        id: 3,
-        name: 'Bob Wilson',
-        role: 'Technical Lead'
-      },
-      last_updated: '2024-01-13T09:20:00Z',
-      estimated_completion: '2024-04-15T00:00:00Z',
-      created_at: '2024-01-10T00:00:00Z'
-    }
-  ],
-  created_at: '2024-01-15T00:00:00Z',
-  products_count: 2,
-  screenshots_count: 5,
-};
-
-// Mock users data
-const mockUsers: CompanyUser[] = [
-  {
-    id: 1,
-    name: 'John Doe',
-    email: 'john@techcorp.com',
-    role: 'ADMIN',
-    status: 'active',
-    last_active: '2024-01-15T00:00:00Z',
-  },
-  {
-    id: 2,
-    name: 'Jane Smith',
-    email: 'jane@techcorp.com',
-    role: 'CREATOR',
-    status: 'active',
-    last_active: '2024-01-14T00:00:00Z',
-  },
-  {
-    id: 3,
-    name: 'Bob Wilson',
-    email: 'bob@techcorp.com',
-    role: 'USER',
-    status: 'inactive',
-    last_active: '2024-01-13T00:00:00Z',
-  },
-];
-
-const SectionHeader: React.FC<{ title: string }> = ({ title }) => (
-  <Box sx={{ mb: 3, mt: 4 }}>
-    <Typography variant="h5" sx={{ color: 'white', fontWeight: 600, mb: 1 }}>
-      {title}
-    </Typography>
-    <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.1)' }} />
-  </Box>
-);
+import { UserRole, UserStatus } from '../../types/user';
+import { SpaceType } from '../../types/space';
 
 const CompanyDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const [company, setCompany] = useState<Company>(mockCompany);
   const [editModalOpen, setEditModalOpen] = useState(false);
+  const [selectedApplicationId, setSelectedApplicationId] = useState<number | null>(null);
 
-  // Company handlers
+  // TODO: Replace with actual data fetching
+  const company: Company = {
+    id: 1,
+    name: 'Acme Corporation',
+    industry: 'Technology',
+    description: 'Leading provider of innovative solutions',
+    size: 'Enterprise',
+    status: 'Active',
+    type: 'Corporation',
+    products: ['Product A', 'Product B'],
+    created_at: '2023-01-01',
+    updated_at: '2023-06-15',
+    website: 'https://acme.com',
+    logo_url: '/images/acme-logo.png',
+    contact_email: 'contact@acme.com',
+    contact_phone: '+1 (555) 123-4567',
+    contact_address: '123 Tech Street, Silicon Valley, CA',
+    bio: 'Acme Corporation is a leading technology company...',
+    branding: {
+      primary_color: '#00A3FF',
+      secondary_color: '#0066CC',
+      logo_url: '/images/acme-logo.png',
+    },
+    metrics: {
+      totalUsers: 1000,
+      activeUsers: 750,
+      totalRevenue: 1000000,
+      monthlyGrowth: 15,
+      userGrowth: 10,
+      revenueGrowth: 20,
+      products_count: 5,
+      screenshots_count: 25,
+    },
+    applications: [
+      {
+        id: 1,
+        name: 'Sales Dashboard',
+        description: 'Real-time sales analytics and reporting dashboard',
+        stage: 'memory',
+        status: 'In Development',
+      },
+      {
+        id: 2,
+        name: 'Customer Portal',
+        description: 'Self-service portal for customer account management',
+        stage: 'blueprint',
+        status: 'Planning',
+      },
+    ],
+    spaces: [
+      {
+        id: 1,
+        name: 'Marketing',
+        type: SpaceType.DEPARTMENT,
+        status: 'Active',
+        created_at: '2023-01-01',
+        description: 'Marketing department responsible for brand and campaigns',
+        attributes: {
+          member_count: 15,
+          manager: 'Jane Smith',
+          budget: 500000
+        }
+      },
+      {
+        id: 2,
+        name: 'Sales',
+        type: SpaceType.DEPARTMENT,
+        status: 'Active',
+        created_at: '2023-01-01',
+        description: 'Sales department driving revenue growth',
+        attributes: {
+          member_count: 25,
+          manager: 'John Doe',
+          budget: 750000
+        }
+      },
+      {
+        id: 3,
+        name: 'Team Alpha',
+        type: SpaceType.TEAM,
+        status: 'Active',
+        created_at: '2023-01-01',
+        description: 'Elite sales team focused on enterprise clients',
+        parent: 2,
+        attributes: {
+          member_count: 8,
+          manager: 'Alice Johnson',
+          budget: 250000
+        }
+      },
+    ],
+    users: [
+      {
+        id: 1,
+        name: 'John Doe',
+        email: 'john@example.com',
+        role: UserRole.ADMIN,
+        status: UserStatus.ACTIVE,
+        designation: 'Senior Manager',
+        department: 'Sales',
+        lastActive: '2023-06-15T10:30:00Z',
+        avatar_url: '/images/avatars/john.jpg',
+      },
+      {
+        id: 2,
+        name: 'Jane Smith',
+        email: 'jane@example.com',
+        role: UserRole.CREATOR,
+        status: UserStatus.ACTIVE,
+        designation: 'Team Lead',
+        department: 'Marketing',
+        lastActive: '2023-06-15T09:45:00Z',
+        avatar_url: '/images/avatars/jane.jpg',
+      },
+    ],
+  };
+
   const handleEditCompany = () => {
+    // TODO: Implement edit company logic
+    console.log('Edit company:', company.id);
+  };
+
+  const handleAddApplication = () => {
+    setSelectedApplicationId(null);
     setEditModalOpen(true);
   };
 
-  // Product handlers
-  const handleEditProduct = (productId: number) => {
-    // Implement edit product logic
+  const handleEditApplication = (id: number) => {
+    setSelectedApplicationId(id);
+    setEditModalOpen(true);
   };
 
-  const handleDeleteProduct = (productId: number) => {
-    // Implement delete product logic
+  const handleDeleteApplication = (id: number) => {
+    // TODO: Implement delete application logic
+    console.log('Delete application:', id);
   };
 
-  // Application handlers
-  const handleEditApplication = (appId: number) => {
-    // Implement edit application logic
+  const handleAddSpace = () => {
+    // TODO: Implement add space logic
+    console.log('Add space');
   };
 
-  const handleViewApplication = (appId: number) => {
-    // Implement view application logic
+  const handleEditSpace = (id: number) => {
+    // TODO: Implement edit space logic
+    console.log('Edit space:', id);
   };
 
-  // User handlers
+  const handleDeleteSpace = (id: number) => {
+    // TODO: Implement delete space logic
+    console.log('Delete space:', id);
+  };
+
   const handleAddUser = () => {
-    // Implement add user logic
+    // TODO: Implement add user logic
+    console.log('Add user');
   };
 
-  const handleEditUser = (userId: number) => {
-    // Implement edit user logic
+  const handleEditUser = (id: number) => {
+    // TODO: Implement edit user logic
+    console.log('Edit user:', id);
   };
 
-  const handleToggleUserStatus = (userId: number) => {
-    // Implement toggle user status logic
-  };
-
-  // Space handlers
-  const handleEditSpace = (spaceId: number) => {
-    // Implement edit space logic
-  };
-
-  const handleAddSpace = (parentId?: number) => {
-    // Implement add space logic
-  };
-
-  // Insights handlers
-  const handleRefreshEmbeddings = () => {
-    // Implement refresh embeddings logic
-  };
-
-  const handleViewCompetitors = () => {
-    // Implement view competitors logic
+  const handleDeleteUser = (id: number) => {
+    // TODO: Implement delete user logic
+    console.log('Delete user:', id);
   };
 
   return (
-    <PageContainer>
-      {/* Core Information */}
+    <Box sx={{ p: { xs: 2, sm: 3 } }}>
       <Grid container spacing={3}>
-        <Grid item xs={12} lg={8}>
-          <CompanyOverview 
+        <Grid item xs={12}>
+          <CompanyOverview
             company={company}
             onEdit={handleEditCompany}
           />
         </Grid>
-        <Grid item xs={12} lg={4}>
-          <CompanyMetrics company={company} />
-        </Grid>
-      </Grid>
 
-      {/* Product & Development */}
-      <SectionHeader title="Product & Development" />
-      <Grid container spacing={3}>
         <Grid item xs={12}>
-          <CompanyApplications 
+          <CompanyMetrics
+            {...company.metrics}
             company={company}
+          />
+        </Grid>
+
+        <Grid item xs={12}>
+          <CompanyApplications
+            companyId={id || ''}
+            applications={company.applications}
+            onAddApplication={handleAddApplication}
             onEditApplication={handleEditApplication}
-            onViewApplication={handleViewApplication}
+            onDeleteApplication={handleDeleteApplication}
           />
         </Grid>
-        <Grid item xs={12}>
-          <CompanyProducts 
-            company={company}
-            onEditProduct={handleEditProduct}
-            onDeleteProduct={handleDeleteProduct}
-          />
-        </Grid>
-      </Grid>
 
-      {/* Organization & Access */}
-      <SectionHeader title="Organization & Access" />
-      <Grid container spacing={3}>
-        <Grid item xs={12} lg={8}>
-          <CompanySpaces 
-            company={company}
-            onEditSpace={handleEditSpace}
+        <Grid item xs={12}>
+          <CompanySpaces
+            spaces={company.spaces}
             onAddSpace={handleAddSpace}
+            onEditSpace={handleEditSpace}
+            onDeleteSpace={handleDeleteSpace}
           />
         </Grid>
-        <Grid item xs={12} lg={4}>
-          <CompanyUsers 
-            users={mockUsers}
+
+        <Grid item xs={12}>
+          <CompanyUsers
+            users={company.users}
             onAddUser={handleAddUser}
             onEditUser={handleEditUser}
-            onToggleUserStatus={handleToggleUserStatus}
+            onDeleteUser={handleDeleteUser}
           />
         </Grid>
       </Grid>
-
-      {/* Brand & Market */}
-      <SectionHeader title="Brand & Market" />
-      <Grid container spacing={3}>
-        <Grid item xs={12} lg={4}>
-          <BrandAttributes 
-            company={company}
-            onEdit={handleEditCompany}
-          />
-        </Grid>
-        <Grid item xs={12} lg={8}>
-          <CompanyInsights 
-            company={company}
-            onRefreshEmbeddings={handleRefreshEmbeddings}
-            onViewCompetitors={handleViewCompetitors}
-          />
-        </Grid>
-      </Grid>
-
-      {/* Edit Modal */}
-      <CompanyEditModal
-        open={editModalOpen}
-        onClose={() => setEditModalOpen(false)}
-        company={company}
-      />
-    </PageContainer>
+    </Box>
   );
 };
 
